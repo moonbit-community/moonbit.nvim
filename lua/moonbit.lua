@@ -1,5 +1,5 @@
 return {
-  setup = function (opts) {
+  setup = function (opts)
     -- detect filetype
     vim.filetype.add {
       extension = {
@@ -10,5 +10,5 @@ return {
         ['moon.mod'] = 'moonmod'
       },
     }
-  }
+  end
 }

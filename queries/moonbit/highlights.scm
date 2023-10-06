@@ -4,11 +4,13 @@
 
 (type_identifier) @type
 (qualified_type_identifier) @type
+(constructor_expression (uppercase_identifier) @type)
 
 ; Type definitions
 
 (enum_definition (identifier) @type.definition)
 (struct_definition (identifier) @type.definition)
+(type_definition (identifier) @type.definition)
 
 ; Builtin types
 
@@ -50,8 +52,6 @@
            "print"))
 
 ;; Constructors
-
-(constructor_expression (uppercase_identifier) @constructor)
 
 (enum_constructor) @constructor
 
@@ -104,9 +104,9 @@
 
 ; Literals
 
-(string_interpolatioin (string_fragment) @string)
+(string_interpolation (string_fragement) @string)
 (string_literal) @string
-(escape_sequence) @string.escape
+(escape_seqence) @string.escape
 (integer_literal) @number
 (float_literal) @float
 (boolean_literal) @boolean
