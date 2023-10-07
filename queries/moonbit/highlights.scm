@@ -1,4 +1,12 @@
-;; Type
+;; Variables
+
+(parameter (lowercase_identifier) @parameter)
+
+(pattern (simple_pattern (lowercase_identifier) @variable))
+
+(qualified_identifier) @variable
+
+;; Types
 
 ; Type identifiers
 
@@ -24,21 +32,41 @@
            "Array"
            "List"))
 
-; Variable identifiers
+; Constructors
 
-(parameter (lowercase_identifier) @parameter)
+(enum_constructor) @constructor
 
-(pattern (simple_pattern (lowercase_identifier) @variable))
+(constructor_expression (colon_colon_uppercase_identifier) @constructor)
 
-(qualified_identifier) @variable
+; Fields
 
-(dot_identifier) @property
+(struct_filed_declaration (lowercase_identifier) @field)
+
+(struct_field_expression (labeled_expression (lowercase_identifier) @field))
+
+(struct_field_expression (labeled_expression_pun (lowercase_identifier) @field))
+
+(struct_filed_expression (labeled_expression (lowercase_identifier) @field))
+
+(struct_filed_expression (labeled_expression_pun (lowercase_identifier) @field))
+
+(struct_filed_pattern (filed_single_pattern (labeled_pattern (lowercase_identifier) @field)))
+
+(struct_filed_pattern (filed_single_pattern (labeled_pattern_pun (lowercase_identifier) @field)))
+
+(dot_identifier) @field
 
 ;; Functions
 
 ; Function calls
 
 (apply_expression (simple_expression (qualified_identifier) @function.call))
+
+; Method calls
+
+(method_expression (colon_colon_lowercase_identifier) @method.call)
+
+(dot_apply_expression (dot_identifier) @method.call)
 
 ; Function definitions
 
@@ -51,10 +79,6 @@
            "println"
            "print"))
 
-;; Constructors
-
-(enum_constructor) @constructor
-
 ;; Operators
 
 [
@@ -63,24 +87,22 @@
   "="
   ">=" "<=" "=="
   "&&" "||"
+  "=>" "->"
 ] @operator
 
-; Keywords
+;; Keywords
+
+(mutability) @keyword
 
 [
-  "let"
-  "var"
-  "while"
-  "break"
-  "continue"
-  "struct"
-  "enum"
-  "type"
+  "let" "var"
+  "struct" "enum" "type"
+  "pub" "priv" "readonly"
 ] @keyword
 
 [ "func" "fn" ] @keyword.function
 "return" @keyword.return
-"while" @report
+[ "while" "break" "continue" ] @report
 
 [
   "if"
@@ -88,12 +110,13 @@
   "match"
 ] @conditional
 
-; Delimiters
+;; Delimiters
 
 [
   ";"
   ":"
   ","
+  ".."
 ] @punctuation.delimiter
 
 [
@@ -102,11 +125,14 @@
   "[" "]"
 ] @punctuation.bracket
 
-; Literals
+;; Literals
 
-(string_interpolation (string_fragement) @string)
+(string_interpolation) @string
 (string_literal) @string
-(escape_seqence) @string.escape
+(escape_sequence) @string.escape
+
+(interpolator) @punctuation.special
+
 (integer_literal) @number
 (float_literal) @float
 (boolean_literal) @boolean
