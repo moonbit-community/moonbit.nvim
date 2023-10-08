@@ -102,7 +102,7 @@
 
 [ "func" "fn" ] @keyword.function
 "return" @keyword.return
-[ "while" "break" "continue" ] @report
+[ "while" "break" "continue" ] @repeat
 
 [
   "if"
