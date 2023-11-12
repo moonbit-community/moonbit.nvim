@@ -8,6 +8,8 @@ Neovim support for the [Moonbit language](https://www.moonbitlang.com).
   - [x] Highlights
   - [ ] Folds
   - [ ] Indents
+- Build system support:
+  - [ ] Compiler plugin
 
 ## Installation
 
@@ -16,7 +18,7 @@ Neovim support for the [Moonbit language](https://www.moonbitlang.com).
 ```lua
 {
   'tonyfettes/moonbit.nvim',
-  ft = { 'moonbit', 'moonmod', 'moonpkg' }
+  ft = { 'moonbit' }
   opts = {},
 }
 ```

@@ -4,16 +4,6 @@ local install_info = {
     files = { 'src/parser.c', 'src/scanner.c' },
     branch = 'main',
   },
-  ['moonpkg'] = {
-    url = 'https://github.com/tonyfettes/tree-sitter-moonpkg',
-    files = { 'src/parser.c' },
-    branch = 'main',
-  },
-  ['moonmod'] = {
-    url = 'https://github.com/tonyfettes/tree-sitter-moonmod',
-    files = { 'src/parser.c' },
-    branch = 'main',
-  },
 }
 
 return {
