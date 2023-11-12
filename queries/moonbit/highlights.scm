@@ -28,7 +28,7 @@
            "String"
            "Int"
            "Int64"
-           "Float64"
+           "Double"
            "Array"
            "List"))
 
