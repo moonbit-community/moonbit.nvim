@@ -1,12 +1,12 @@
 " Vim compiler file
-" Compiler: Moon (distrbuted as moonbit)
+" Compiler: Moon (distrbuted with MoonBit)
 " Maintainer: Haoxiang Fei <tonyfettes@tonyfettes.com>
-" Last Change: 2023 Oct 15
+" Last Change: 2023 Nov 20
 
 if exists("current_compiler")
   finish
 endif
-let current_compiler = "moonbit"
+let current_compiler = "moon"
 
 if exists(":CompilerSet") != 2
   command -nargs=* CompilerSet setlocal <args>
