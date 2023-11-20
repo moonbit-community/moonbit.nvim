@@ -22,7 +22,7 @@
 
 ; Builtin types
 
-((type_identifier) @type.builtin
+((qualified_type_identifier) @type.builtin
  (#any-of? @type.builtin
            "Bool"
            "String"
