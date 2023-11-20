@@ -16,7 +16,7 @@ return {
         stream = 'stdout',
         ignore_exitcode = true,
         args = { 'check' },
-        parser = require'lint.parser'.from_errorformat[[%E%f:%l:%c-%e:%k\ %m,%C\ %m,%-G%.%#]]
+        parser = require'lint.parser'.from_errorformat[[%W%f:%l:%c-%e:%k\ Warning\ %n:\ %m,%E%f:%l:%c-%e:%k\ %m,%C%m,%-G%.%#]]
       }
       lint.linters_by_ft = {
         moonbit = { 'moon' }
