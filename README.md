@@ -2,6 +2,8 @@
 
 Neovim support for the [MoonBit language](https://www.moonbitlang.com).
 
+![Screenshot from 2023-11-21 01-24-56](https://github.com/tonyfettes/moonbit.nvim/assets/29998228/0e3080e4-63c4-4f72-8ec7-fcf8bb82181c)
+
 ## Roadmap
 
 - [ ] Tree-sitter support:
