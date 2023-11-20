@@ -6,13 +6,15 @@ Neovim support for the [MoonBit language](https://www.moonbitlang.com).
 
 ## Roadmap
 
-- [ ] Tree-sitter support:
+- [ ] Tree-sitter support
   - [x] Highlights
-  - [ ] Folds
+  - [x] Folds
   - [ ] Indents
-- Build system support:
+- [ ] Build system support
   - [x] Compiler plugin
   - [x] Diagnostics through [nvim-lint](https://github.com/mfussenegger/nvim-lint)
+- [ ] JSON Schema
+- [ ] Language server
 
 ## Installation
 
