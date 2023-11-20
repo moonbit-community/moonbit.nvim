@@ -36,7 +36,7 @@
 
 (enum_constructor) @constructor
 
-(constructor_expression (colon_colon_uppercase_identifier) @constructor)
+(constructor_expression (uppercase_identifier) @constructor)
 
 ; Fields
 
@@ -64,7 +64,7 @@
 
 ; Method calls
 
-(method_expression (colon_colon_lowercase_identifier) @method.call)
+(method_expression (lowercase_identifier) @method.call)
 
 (dot_apply_expression (dot_identifier) @method.call)
 
@@ -100,7 +100,7 @@
   "pub" "priv" "readonly"
 ] @keyword
 
-[ "func" "fn" ] @keyword.function
+[ "fn" ] @keyword.function
 "return" @keyword.return
 [ "while" "break" "continue" ] @repeat
 
