@@ -132,6 +132,7 @@
 (escape_sequence) @string.escape
 
 (interpolator) @punctuation.special
+(interpolator ")" @punctuation.special)
 
 (integer_literal) @number
 (float_literal) @float
