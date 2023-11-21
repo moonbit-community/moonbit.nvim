@@ -15,7 +15,7 @@ return {
         append_fname = false,
         stream = 'stdout',
         ignore_exitcode = true,
-        args = { 'check' },
+        args = { 'check', '-q' },
         parser = require'lint.parser'.from_errorformat[[%W%f:%l:%c-%e:%k\ Warning\ %n:\ %m,%E%f:%l:%c-%e:%k\ %m,%C%m,%-G%.%#]]
       }
       lint.linters_by_ft = {
