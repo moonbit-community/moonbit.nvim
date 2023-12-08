@@ -42,13 +42,13 @@
 
 (struct_filed_declaration (lowercase_identifier) @field)
 
+(struct_field_expressions (labeled_expression (lowercase_identifier) @field))
+
+(struct_field_expressions (labeled_expression_pun (lowercase_identifier) @field))
+
 (struct_field_expression (labeled_expression (lowercase_identifier) @field))
 
 (struct_field_expression (labeled_expression_pun (lowercase_identifier) @field))
-
-(struct_filed_expression (labeled_expression (lowercase_identifier) @field))
-
-(struct_filed_expression (labeled_expression_pun (lowercase_identifier) @field))
 
 (struct_filed_pattern (filed_single_pattern (labeled_pattern (lowercase_identifier) @field)))
 
