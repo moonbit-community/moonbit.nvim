@@ -8,9 +8,16 @@ if exists('b:did_ftplugin')
 endif
 let b:did_ftplugin = 1
 
+let s:save_cpo = &cpo
+set cpo&vim
+
+setlocal formatoptions-=t formatoptions+=ro
 setlocal comments=:///,://
 setlocal commentstring=//%s
 
-let b:undo_ftplugin = 'setl com< cms<'
+let b:undo_ftplugin = 'setlocal formatoptions< comments< commentstring<'
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
 
 " vim: sw=2 sts=2 et
