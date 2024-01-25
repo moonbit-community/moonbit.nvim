@@ -83,7 +83,6 @@
 
 [
 	"+" "-" "*" "/" "%"
-  ":="
   "="
   ">=" "<=" "=="
   "&&" "||"
@@ -95,7 +94,7 @@
 (mutability) @keyword
 
 [
-  "let" "var"
+  "let" "mut"
   "struct" "enum" "type"
   "pub" "priv" "readonly"
 ] @keyword
