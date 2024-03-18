@@ -1,6 +1,6 @@
 local install_info = {
   ['moonbit'] = {
-    url = 'https://github.com/bzy-debug/tree-sitter-moonbit',
+    url = 'https://github.com/moonbitlang/tree-sitter-moonbit',
     files = { 'src/parser.c', 'src/scanner.c' },
     branch = 'main',
   },
