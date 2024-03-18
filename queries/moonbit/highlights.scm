@@ -40,7 +40,7 @@
 
 ; Fields
 
-(struct_filed_declaration (lowercase_identifier) @field)
+(struct_field_declaration (lowercase_identifier) @field)
 
 (struct_field_expressions (labeled_expression (lowercase_identifier) @field))
 
@@ -50,9 +50,9 @@
 
 (struct_field_expression (labeled_expression_pun (lowercase_identifier) @field))
 
-(struct_filed_pattern (filed_single_pattern (labeled_pattern (lowercase_identifier) @field)))
+(struct_field_pattern (field_single_pattern (labeled_pattern (lowercase_identifier) @field)))
 
-(struct_filed_pattern (filed_single_pattern (labeled_pattern_pun (lowercase_identifier) @field)))
+(struct_field_pattern (field_single_pattern (labeled_pattern_pun (lowercase_identifier) @field)))
 
 (dot_identifier) @field
 
@@ -99,7 +99,9 @@
   "pub" "priv" "readonly"
 ] @keyword
 
-[ "fn" ] @keyword.function
+(derive) @keyword
+
+[ "fn" "test" ] @keyword.function
 "return" @keyword.return
 [ "while" "break" "continue" ] @repeat
 
@@ -113,11 +115,13 @@
 
 [
   ";"
-  ":"
   ","
-  ".."
-  "::"
 ] @punctuation.delimiter
+
+(colon) @punctuation.delimiter
+(colon_colon) @punctuation.delimiter
+(dot_operator) @punctuation.delimiter
+(dot_dot) @punctuation.delimiter
 
 [
   "(" ")"
@@ -129,6 +133,7 @@
 
 (string_interpolation) @string
 (string_literal) @string
+(multiline_string_literal) @string
 (escape_sequence) @string.escape
 
 (interpolator) @punctuation.special
