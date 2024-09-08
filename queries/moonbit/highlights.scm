@@ -1,10 +1,24 @@
+;; Interpolation
+
+(interpolator) @none
+
+;; Packages
+
+(package_identifier) @module
+
 ;; Variables
 
 (parameter (lowercase_identifier) @parameter)
 
+(parameter (labeled_identifier) @parameter)
+
 (pattern (simple_pattern (lowercase_identifier) @variable))
 
 (qualified_identifier) @variable
+
+((qualified_identifier) @variable.builtin
+ (#any-of? @variable.builtin
+           "self"))
 
 ;; Types
 
@@ -19,6 +33,7 @@
 (enum_definition (identifier) @type.definition)
 (struct_definition (identifier) @type.definition)
 (type_definition (identifier) @type.definition)
+(trait_definition (identifier) @type.definition)
 
 ; Builtin types
 
@@ -72,38 +87,49 @@
 
 (function_definition (function_identifier) @function)
 
+(trait_method_declaration (function_identifier) @function)
+
 ; Builtin Functions
 
 ((qualified_identifier) @function.builtin
  (#any-of? @function.builtin
            "println"
-           "print"))
+           "print"
+           "abort"
+           "panic"))
 
 ;; Operators
 
 [
 	"+" "-" "*" "/" "%"
   "="
-  ">=" "<=" "=="
+  "<" ">" ">=" "<=" "==" "!="
   "&&" "||"
   "=>" "->"
 ] @operator
 
 ;; Keywords
 
-(mutability) @keyword
+(mutability) @keyword.modifier
+
+[
+  "struct" "enum" "type" "trait"
+] @keyword.type
+
+[
+  "pub" "priv" "readonly"
+] @keyword.modifier
 
 [
   "let" "mut"
-  "struct" "enum" "type"
-  "pub" "priv" "readonly"
+  "with"
 ] @keyword
 
 (derive) @keyword
 
-[ "fn" "test" ] @keyword.function
+[ "fn" "test" "impl" ] @keyword.function
 "return" @keyword.return
-[ "while" "break" "continue" ] @repeat
+[ "while" "loop" "for" "break" "continue" "in" ] @repeat
 
 [
   "if"
@@ -136,8 +162,9 @@
 (multiline_string_literal) @string
 (escape_sequence) @string.escape
 
-(interpolator) @punctuation.special
-(interpolator ")" @punctuation.special)
+(interpolator
+ "\\{" @punctuation.special
+ "}" @punctuation.special)
 
 (integer_literal) @number
 (float_literal) @float
