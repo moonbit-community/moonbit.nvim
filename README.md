@@ -1,6 +1,6 @@
 # moonbit.nvim
 
-**NOTICE: The parser file (`parser.mly`) in the [moonbit-docs](https://github.com/moonbitlang/moonbit-docs) has not been updated for 3 months. Please use their setups for writing up-to-date MoonBit programs.**
+**NOTICE: The parser file (`parser.mly`) in the [moonbit-docs](https://github.com/moonbitlang/moonbit-docs) has not been updated for more than 3 months. Please use their setups for writing up-to-date MoonBit programs.**
 
 Neovim support for the [MoonBit language](https://www.moonbitlang.com).
 
@@ -14,9 +14,9 @@ Neovim support for the [MoonBit language](https://www.moonbitlang.com).
   - [ ] Indents
 - [ ] Build system support
   - [x] Compiler plugin
-  - [x] Diagnostics through [nvim-lint](https://github.com/mfussenegger/nvim-lint)
+  - [x] ~Diagnostics through [nvim-lint](https://github.com/mfussenegger/nvim-lint)~ Removed b/c LSP
 - [ ] JSON Schema
-- [ ] Language server
+- [x] Language server
 
 ## Installation
 
@@ -24,18 +24,12 @@ First you need to have the MoonBit toolchain installed. You can follow the
 instruction on the [Download Page](https://www.moonbitlang.com/download/) of
 the MoonBit language.
 
-If you're on Arch Linux, you can use the
-[moonbit-bin](https://aur.archlinux.org/packages/moonbit-bin) package from AUR.
-
 ### `lazy.nvim`
 
 ```lua
 {
   'tonyfettes/moonbit.nvim',
   ft = { 'moonbit' }
-  dependencies = {
-    'mfussenegger/nvim-lint', -- for linting support
-  },
   opts = {},
 }
 ```
