@@ -29,7 +29,7 @@ the MoonBit language.
 ```lua
 {
   'tonyfettes/moonbit.nvim',
-  ft = { 'moonbit' }
+  ft = { 'moonbit' },
   opts = {},
 }
 ```
