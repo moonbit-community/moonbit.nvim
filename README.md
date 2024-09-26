@@ -30,6 +30,17 @@ the MoonBit language.
 {
   'tonyfettes/moonbit.nvim',
   ft = { 'moonbit' },
-  opts = {},
+  opts = {
+    -- optionally disable the treesitter integration
+    treesitter =  { enabled = true }
+    -- configure the language server integration
+    -- set `lsp = false` to disable the language server integration
+    lsp = {
+      -- provide an `on_attach` function to run when the language server starts
+      on_attach = function(client, bufnr) end
+      -- provide client capabilities to pass to the language server
+      capabilities = vim.lsp.protocol.make_client_capabilities(),
+    }
+  },
 }
 ```
