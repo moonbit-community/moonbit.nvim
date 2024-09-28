@@ -8,9 +8,7 @@
 
 ;; Variables
 
-(parameter (lowercase_identifier) @parameter)
-
-(parameter (labeled_identifier) @parameter)
+(parameter (parameter_label) @parameter)
 
 (pattern (simple_pattern (lowercase_identifier) @variable))
 
