@@ -7,7 +7,7 @@
 ; Variables
 
 (value_definition (lowercase_identifier) @definition.var)
-(parameter (lowercase_identifier) @definition.parameter)
+(parameter (parameter_label) @definition.parameter)
 (let_expression (pattern (simple_pattern (lowercase_identifier)) @definition.var))
 (let_mut_expression (lowercase_identifier) @definition.var)
 
