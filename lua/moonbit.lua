@@ -1,3 +1,7 @@
+local trim = function(s)
+  return s:gsub('^%s*(.-)%s*$', '%1')
+end
+
 return {
   setup = function(opts)
     local treesitter_opts = opts.treesitter or {}
@@ -16,8 +20,41 @@ return {
             name = 'moonbit-lsp',
             cmd = { 'moonbit-lsp' },
             root_dir = vim.fs.root(ev.buf, { 'moon.mod.json' }),
+            commands = {
+              ['moonbit-lsp/test'] = function(command, ctx)
+                local arguments = command.arguments[1]
+                local stdout = vim.uv.new_pipe()
+                local stderr = vim.uv.new_pipe()
+                local handle, pid = vim.uv.spawn('moon', {
+                  args = {
+                    'test',
+                    '--target=' .. arguments.backend,
+                    '-p',
+                    arguments.pkgPath,
+                    '-f',
+                    arguments.fileName,
+                    '-i',
+                    tostring(arguments.index),
+                  },
+                  cwd = arguments.cwdUri:sub(7, -1),
+                  stdio = { nil, stdout, stderr }
+                }, function()
+                  -- print('exit code', code)
+                end)
+                vim.uv.read_start(stdout, function(err, data)
+                  assert(not err, err)
+                  if not data then
+                    return
+                  end
+                  local trimmed = trim(data)
+                  if trimmed ~= "" then
+                    print(trimmed)
+                  end
+                end)
+              end,
+            },
           }))
-        end
+        end,
       })
     end
   end
