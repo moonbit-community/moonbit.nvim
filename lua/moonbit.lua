@@ -25,20 +25,31 @@ return {
                 local arguments = command.arguments[1]
                 local stdout = vim.uv.new_pipe()
                 local stderr = vim.uv.new_pipe()
+                local args = {
+                  'test',
+                  '--target=' .. arguments.backend,
+                  '-p',
+                  arguments.pkgPath,
+                  '-f',
+                  arguments.fileName,
+                  '-i',
+                  tostring(arguments.index),
+                }
+                if arguments.update then
+                  table.insert(args, '-u')
+                end
                 local handle, pid = vim.uv.spawn('moon', {
-                  args = {
-                    'test',
-                    '--target=' .. arguments.backend,
-                    '-p',
-                    arguments.pkgPath,
-                    '-f',
-                    arguments.fileName,
-                    '-i',
-                    tostring(arguments.index),
-                  },
+                  args = args,
                   cwd = arguments.cwdUri:sub(7, -1),
                   stdio = { nil, stdout, stderr }
                 }, function()
+                  stdout:close()
+                  stderr:close()
+                  vim.schedule(function()
+                    vim.api.nvim_buf_call(ev.buf, function()
+                      vim.cmd [[edit]]
+                    end)
+                  end)
                   -- print('exit code', code)
                 end)
                 vim.uv.read_start(stdout, function(err, data)
