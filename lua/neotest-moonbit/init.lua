@@ -200,14 +200,6 @@ end
 ---@param tree neotest.Tree
 ---@return table<string, neotest.Result>
 function M.Adapter.results(spec, result, tree)
-  -- vim.print("=================== results")
-  -- vim.print(vim.inspect(spec))
-  -- vim.print(vim.inspect(result))
-  -- vim.print(vim.inspect(tree:data()))
-  -- vim.print("id: " .. tree:data().id)
-  -- if result.code == 0 then
-  --   return { [tree:data().id] = { status = types.ResultStatus.passed } }
-  -- end
   local results = build_results(tree, {})
 
   if result.code == 0 then
@@ -219,9 +211,6 @@ function M.Adapter.results(spec, result, tree)
     logger.error(err)
     return {}
   end
-
-  -- print("output")
-  -- print(vim.inspect(output))
 
   local function get_test_filepath(context, failed)
     if context.kind ~= "dir" then
@@ -242,8 +231,6 @@ function M.Adapter.results(spec, result, tree)
   end
 
   local failure_jsons = jsonlist.decode_from_string(output)
-  -- vim.print("failure_jsons: " .. #failure_jsons)
-  -- vim.print(vim.inspect(failure_jsons))
 
   for _, failed in pairs(failure_jsons) do
     -- parse range and put it into neotest.Result
@@ -261,7 +248,6 @@ function M.Adapter.results(spec, result, tree)
       },
     }
   end
-  -- vim.print(vim.inspect(results))
   return results
 end
 
