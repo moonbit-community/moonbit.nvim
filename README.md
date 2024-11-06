@@ -44,3 +44,22 @@ the MoonBit language.
   },
 }
 ```
+## neotest
+
+`moonbit.nvim` provides a [neotest](https://github.com/nvim-neotest/neotest) adapter, example config using `lazy.nvim`
+
+```lua
+{
+  "nvim-neotest/neotest",
+  depedencies = {
+    "moonbit-community/moonbit.nvim",
+  },
+  config = function()
+    require("neotest").setup({
+      adapters = {
+        require("neotest-moonbit"),
+      },
+    })
+  end,
+}
+```
