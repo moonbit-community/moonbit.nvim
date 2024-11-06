@@ -63,11 +63,13 @@ function M.Adapter.filter_dir(name, rel_path, root)
 
   local source = moon_mod_json.source or "src"
 
-  if source == rel_path then
-    return true
-  end
-  if not vim.startswith(rel_path, source) then
-    return false
+  if source ~= nil then
+    if source == rel_path then
+      return true
+    end
+    if not vim.startswith(rel_path, source) then
+      return false
+    end
   end
 
   -- XXX: assuming rel_path is a package path
