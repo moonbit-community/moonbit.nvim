@@ -61,7 +61,7 @@ function M.Adapter.filter_dir(name, rel_path, root)
     return false
   end
 
-  local source = moon_mod_json.source or "src"
+  local source = moon_mod_json.source
 
   if source ~= nil then
     if source == rel_path then
