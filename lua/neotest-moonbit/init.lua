@@ -142,6 +142,7 @@ function M.Adapter.build_spec(args)
   local rel_path = pos.path:sub(#src_path + 2)
   local filename = basename(rel_path)
   local pkg_name = rel_path:sub(0, -(#filename + 2))
+  local mod_name = moon_mod_json.name
 
   if pos.type == "test" then
     local splitted_pos_id = vim.fn.split(pos.id, "::")
@@ -172,7 +173,8 @@ function M.Adapter.build_spec(args)
       context = {
         kind = "dir",
         path = pos.path,
-        pkg_name = pkg_name,
+        mod_name = mod_name,
+        src = src_path,
       },
     }
   else
@@ -221,23 +223,32 @@ function M.Adapter.results(spec, result, tree)
   -- print("output")
   -- print(vim.inspect(output))
 
-  local function build_id(context, res)
+  local function get_test_filepath(context, failed)
     if context.kind ~= "dir" then
-      return context.path .. "::" .. res.index
+      return context.path
     end
-    -- for `dir` kind, we want extract filename from res.message
-    local filename = vim.fn.split(res.message, ":")[2]
-    filename = filename:sub(2)
-    return filename .. "::" .. res.index
+    -- for project(dir) wise result, we have to compose the path
+    -- path = ctx.src + (failed.package - ctx.mod_name) + failed.filename
+    return joinpath(context.src, failed.package:sub(#context.mod_name + 1), failed.filename)
+  end
+
+  local function build_id(context, res)
+    return get_test_filepath(context, res) .. "::" .. res.index
+  end
+
+  local function parse_line_number(context, failed)
+    local path = get_test_filepath(context, failed)
+    return failed.message:match(path .. ":(%d+):")
   end
 
   local failure_jsons = jsonlist.decode_from_string(output)
   -- vim.print("failure_jsons: " .. #failure_jsons)
   -- vim.print(vim.inspect(failure_jsons))
+
   for _, failed in pairs(failure_jsons) do
     -- parse range and put it into neotest.Result
     local id = build_id(spec.context, failed)
-    local line = failed.message:match(spec.context.path .. ":(%d+):")
+    local line = parse_line_number(spec.context, failed)
     local message = failed.message:match("`(.+)`$") or "Test failed"
     results[id] = {
       status = types.ResultStatus.failed,
