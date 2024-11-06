@@ -34,12 +34,13 @@ function M.Adapter.root(dir)
 end
 
 local function readJSON(path)
-  local f, err = io.open(path, "r"):read("*a")
-  if err then
-    logger.error(err)
+  local f, err = io.open(path, "r")
+  if err or f == nil then
+    logger.error("Failed to read " .. path)
     return nil
   end
-  local ok, json = pcall(vim.json.decode, f)
+  local content = f:read("*a")
+  local ok, json = pcall(vim.json.decode, content)
   if not ok then
     logger.error("Failed to parse " .. path)
     return nil
@@ -189,6 +190,7 @@ end
 ---@return table<string, neotest.Result>
 local function build_results(tree, results)
   -- traverse the nested tree, and put the result
+  -- we mark all test as success first
   results[tree:data().id] = { status = types.ResultStatus.passed }
   for _, child in pairs(tree:children()) do
     build_results(child, results)
@@ -208,11 +210,12 @@ function M.Adapter.results(spec, result, tree)
     return results
   end
 
-  local output, err = io.open(result.output, "r"):read("*a")
-  if err then
-    logger.error(err)
+  local f, err = io.open(result.output, "r")
+  if err or f == nil then
+    logger.error("Failed to read " .. result.output)
     return {}
   end
+  local output = f:read("*a")
 
   local function get_test_filepath(context, failed)
     if context.kind ~= "dir" then
