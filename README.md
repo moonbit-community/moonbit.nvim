@@ -53,6 +53,8 @@ the MoonBit language.
   depedencies = {
     "moonbit-community/moonbit.nvim",
   },
+  -- Using opts instead of config maximizes composability of overrides.
+  -- See: https://github.com/folke/lazy.nvim/discussions/1185#discussioncomment-7579598
   opts = function(_, opts)
     if not opts.adapters then opts.adapters = {} end
     table.insert(opts.adapters, require("neotest-moonbit"))
