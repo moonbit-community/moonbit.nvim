@@ -50,7 +50,7 @@ the MoonBit language.
 ```lua
 {
   "nvim-neotest/neotest",
-  depedencies = {
+  dependencies = {
     "moonbit-community/moonbit.nvim",
   },
   config = function()
@@ -68,7 +68,7 @@ According to the [lazy.nvim docs](https://lazy.folke.io/usage/structuring#%EF%B8
 ```lua
 {
   "nvim-neotest/neotest",
-  depedencies = {
+  dependencies = {
     "moonbit-community/moonbit.nvim",
   },
   opts = function(_, opts)
