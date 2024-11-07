@@ -45,7 +45,7 @@ the MoonBit language.
 ```
 ## neotest
 
-`moonbit.nvim` provides a [neotest](https://github.com/nvim-neotest/neotest) adapter, example config using `lazy.nvim`
+`moonbit.nvim` provides a [neotest](https://github.com/nvim-neotest/neotest) adapter. Below is an minimal example config using `lazy.nvim`:
 
 ```lua
 {
@@ -53,8 +53,24 @@ the MoonBit language.
   depedencies = {
     "moonbit-community/moonbit.nvim",
   },
-  -- Using opts instead of config maximizes composability of overrides.
-  -- See: https://github.com/folke/lazy.nvim/discussions/1185#discussioncomment-7579598
+  config = function()
+    require("neotest").setup({
+      adapters = {
+        require("neotest-moonbit"),
+      },
+    })
+  end,
+}
+```
+
+According to the [lazy.nvim docs](https://lazy.folke.io/usage/structuring#%EF%B8%8F-importing-specs-config--opts), setting the `config` property in an override spec might accidentally overwrite that of an existing parent spec. On the other hand, the `opts` property is guaranteed to be merged with that of the parent spec. Therefore, we recommend the following settings:
+
+```lua
+{
+  "nvim-neotest/neotest",
+  depedencies = {
+    "moonbit-community/moonbit.nvim",
+  },
   opts = function(_, opts)
     if not opts.adapters then opts.adapters = {} end
     table.insert(opts.adapters, require("neotest-moonbit"))
