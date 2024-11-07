@@ -53,12 +53,9 @@ the MoonBit language.
   depedencies = {
     "moonbit-community/moonbit.nvim",
   },
-  config = function()
-    require("neotest").setup({
-      adapters = {
-        require("neotest-moonbit"),
-      },
-    })
+  opts = function(_, opts)
+    if not opts.adapters then opts.adapters = {} end
+    table.insert(opts.adapters, require("neotest-moonbit"))
   end,
 }
 ```
