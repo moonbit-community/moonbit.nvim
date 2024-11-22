@@ -115,11 +115,11 @@
 ] @keyword.type
 
 [
-  "pub" "priv" "readonly"
+  "pub" "priv" "readonly" "all" "open"
 ] @keyword.modifier
 
 [
-  "let" "mut"
+  "let" "mut" "const"
   "with"
 ] @keyword
 
