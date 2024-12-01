@@ -68,5 +68,10 @@ return {
         end,
       })
     end
-  end
+  end,
+  update = function()
+    require 'moonbit.treesitter'.setup {}
+    local update = require("nvim-treesitter.install").update {}
+    update("moonbit")
+  end,
 }

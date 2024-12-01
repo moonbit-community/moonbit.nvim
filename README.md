@@ -29,6 +29,9 @@ the MoonBit language.
 {
   'moonbit-community/moonbit.nvim',
   ft = { 'moonbit' },
+  build = function()
+    require('moonbit').update()
+  end,
   opts = {
     -- optionally disable the treesitter integration
     treesitter =  { enabled = true },
