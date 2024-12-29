@@ -11,6 +11,12 @@ return {
       require 'moonbit.treesitter'.setup(treesitter_opts)
     end
 
+    -- add plenary filetype 
+    local has_plenary = pcall(require, "plenary")
+    if has_plenary then
+        require("plenary.filetype").add_file("moonbit")
+    end
+
     if opts.lsp ~= false then
       vim.api.nvim_create_autocmd('FileType', {
         pattern = 'moonbit',
