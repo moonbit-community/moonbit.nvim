@@ -31,7 +31,11 @@ the MoonBit language.
   ft = { 'moonbit' },
   opts = {
     -- optionally disable the treesitter integration
-    treesitter =  { enabled = true },
+    treesitter =  {
+      enabled = true
+      -- Set false to disable automatic installation and updating of parsers.
+      auto_install = true
+    },
     -- configure the language server integration
     -- set `lsp = false` to disable the language server integration
     lsp = {
