@@ -5,16 +5,15 @@ end
 return {
   setup = function(opts)
     local treesitter_opts = opts.treesitter or {}
-    local has_treesitter = pcall(require, 'nvim-treesitter.parsers')
     local enabled = treesitter_opts.enabled or true
-    if has_treesitter and enabled then
+    if enabled then
       require 'moonbit.treesitter'.setup(treesitter_opts)
     end
 
-    -- add plenary filetype 
+    -- add plenary filetype
     local has_plenary = pcall(require, "plenary")
     if has_plenary then
-        require("plenary.filetype").add_file("moonbit")
+      require("plenary.filetype").add_file("moonbit")
     end
 
     if opts.lsp ~= false then
