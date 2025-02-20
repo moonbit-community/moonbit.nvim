@@ -86,8 +86,8 @@
 (struct_field_expressions (labeled_expression_pun (lowercase_identifier) @field))
 (struct_field_expression (labeled_expression (lowercase_identifier) @field))
 (struct_field_expression (labeled_expression_pun (lowercase_identifier) @field))
-(struct_field_pattern (field_single_pattern (labeled_pattern (lowercase_identifier) @field)))
-(struct_field_pattern (field_single_pattern (labeled_pattern_pun (lowercase_identifier) @field)))
+(struct_pattern (struct_field_pattern (labeled_pattern (lowercase_identifier) @field)))
+(struct_pattern (struct_field_pattern (labeled_pattern_pun (lowercase_identifier) @field)))
 (access_expression (accessor (dot_identifier) @field))
 
 ;; Functions
@@ -171,7 +171,7 @@
 
 (colon) @punctuation.delimiter
 (colon_colon) @punctuation.delimiter
-(dot_operator) @punctuation.delimiter
+(dot) @punctuation.delimiter
 (dot_dot) @punctuation.delimiter
 
 [
