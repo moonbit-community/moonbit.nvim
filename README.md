@@ -32,7 +32,7 @@ the MoonBit language.
   opts = {
     -- optionally disable the treesitter integration
     treesitter =  {
-      enabled = true
+      enabled = true,
       -- Set false to disable automatic installation and updating of parsers.
       auto_install = true
     },
