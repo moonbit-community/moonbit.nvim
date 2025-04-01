@@ -104,7 +104,7 @@ return {
           end, {
             range = true,
           })
-          vim.keymap.set({ 'n', 'x' }, '<LocalLeader>#|', function()
+          vim.keymap.set({ 'n', 'x' }, '<Plug>(MoonBitToggleMultilineString)', function()
             vim.go.operatorfunc = "v:lua.require'moonbit'.api.toggle_multiline_string_operatorfunc"
             return 'g@'
           end, {
@@ -112,13 +112,21 @@ return {
             desc = 'Toggle multiline string',
             expr = true,
           })
-          vim.keymap.set({ 'n', 'x' }, '<LocalLeader>$|', function()
+          vim.keymap.set({ 'n', 'x' }, '<Plug>(MoonBitToggleMultilineInterpolation)', function()
             vim.go.operatorfunc = "v:lua.require'moonbit'.api.toggle_multiline_interpolation_operatorfunc"
             return 'g@'
           end, {
             buffer = ev.buf,
             desc = 'Toggle multiline interpolation',
             expr = true,
+          })
+          vim.keymap.set({ 'n', 'x' }, '<LocalLeader>#|', '<Plug>(MoonBitToggleMultilineString)', {
+            buffer = ev.buf,
+            desc = 'Toggle multiline string',
+          })
+          vim.keymap.set({ 'n', 'x' }, '<LocalLeader>$|', '<Plug>(MoonBitToggleMultilineInterpolation)', {
+            buffer = ev.buf,
+            desc = 'Toggle multiline interpolation',
           })
           vim.lsp.start(vim.tbl_deep_extend("keep", opts.lsp or {}, {
             name = 'moonbit-lsp',
