@@ -107,6 +107,23 @@ end
 
 local path_sep = package.config:sub(1, 1)
 
+---@return string
+local function find_lsp_server()
+  local moon_home = vim.env["MOON_HOME"]
+  if moon_home == nil then
+    local home = vim.env["HOME"]
+    if home == nil then
+      home = '~'
+    end
+    moon_home = home .. path_sep .. '.moon'
+  end
+  local lsp_server_path = vim.fn.resolve(moon_home .. path_sep .. 'bin' .. path_sep .. 'lsp-server.js')
+  if vim.fn.executable(lsp_server_path) ~= 0 then
+    return lsp_server_path
+  end
+  return 'moonbit-lsp'
+end
+
 return {
   api = {
     toggle_multiline_string_operatorfunc = function(type)
@@ -129,29 +146,12 @@ return {
       require("plenary.filetype").add_file("moonbit")
     end
 
-    ---@return string
-    local function find_lsp_cmd()
-      local moon_home = vim.env["MOON_HOME"]
-      if moon_home == nil then
-        local home = vim.env["HOME"]
-        if home == nil then
-          home = '~'
-        end
-        moon_home = home .. path_sep .. '.moon'
-      end
-      local lsp_server_path = vim.fn.resolve(moon_home .. path_sep .. 'bin' .. path_sep .. 'lsp-server.js')
-      if vim.fn.executable(lsp_server_path) ~= 0 then
-        return lsp_server_path
-      end
-      return 'moonbit-lsp'
-    end
-
     if opts.lsp ~= false then
       local function on_attach(ev)
         setup_toggle_multiline_string(ev.buf)
         vim.lsp.start(vim.tbl_deep_extend("keep", opts.lsp or {}, {
           name = 'moonbit-lsp',
-          cmd = { find_lsp_cmd() },
+          cmd = { find_lsp_server() },
           root_dir = vim.fs.root(ev.buf, { 'moon.mod.json' }),
           commands = {
             ['moonbit-lsp/test'] = function(command, ctx)
