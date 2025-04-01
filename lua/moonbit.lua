@@ -124,6 +124,61 @@ local function find_lsp_server()
   return 'moonbit-lsp'
 end
 
+---@class MoonBit.LSP.Commands.Test
+---@field backend string
+---@field pkgPath string
+---@field fileName string
+---@field index integer
+---@field update boolean
+---@field cwdUri string
+
+---@param buffer integer
+---@param arguments MoonBit.LSP.Commands.Test
+local function execute_moon_test(buffer, arguments)
+  local args = {
+    'moon',
+    'test',
+    '--no-render',
+    '--target=' .. arguments.backend,
+  }
+  if arguments.pkgPath ~= nil then
+    table.insert(args, '-p')
+    table.insert(args, arguments.pkgPath)
+  end
+  if arguments.fileName ~= nil then
+    table.insert(args, '-f')
+    table.insert(args, arguments.fileName)
+  end
+  if arguments.index ~= nil then
+    table.insert(args, '-i')
+    table.insert(args, tostring(arguments.index))
+  end
+  if arguments.update then
+    table.insert(args, '-u')
+  end
+  ---@param process vim.SystemCompleted
+  local function on_test_exit(process)
+    if arguments.update then
+      vim.schedule(function()
+        vim.cmd[[edit]]
+      end)
+    end
+    if process.code == 0 then
+      return
+    end
+    local test_errorformats = { '%Etest %o failed: FAILED: %f:%l:%c-%e:%k %m', '%Etest %o failed',
+      '%-Cexpect test failed at %f:%l:%c-%e:%k' }
+    local test_errorformat = table.concat(test_errorformats, ',')
+    vim.schedule(function()
+      local output = process.stdout .. '\n' .. process.stderr
+      local lines = vim.split(output, '\n')
+      local errorformat = test_errorformat .. ',' .. vim.bo.errorformat
+      vim.fn.setqflist({}, ' ', { lines = lines, efm = errorformat })
+    end)
+  end
+  vim.system(args, { text = true }, on_test_exit)
+end
+
 return {
   api = {
     toggle_multiline_string_operatorfunc = function(type)
@@ -149,53 +204,15 @@ return {
     if opts.lsp ~= false then
       local function on_attach(ev)
         setup_toggle_multiline_string(ev.buf)
-        vim.cmd[[compiler moon]]
+        vim.cmd [[compiler moon]]
         vim.lsp.start(vim.tbl_deep_extend("keep", opts.lsp or {}, {
           name = 'moonbit-lsp',
           cmd = { find_lsp_server() },
           root_dir = vim.fs.root(ev.buf, { 'moon.mod.json' }),
           commands = {
-            ['moonbit-lsp/test'] = function(command, ctx)
+            ['moonbit-lsp/test'] = function(command)
               local arguments = command.arguments[1]
-              local stdout = vim.uv.new_pipe()
-              local stderr = vim.uv.new_pipe()
-              local args = {
-                'test',
-                '--target=' .. arguments.backend,
-                '-p',
-                arguments.pkgPath,
-                '-f',
-                arguments.fileName,
-                '-i',
-                tostring(arguments.index),
-              }
-              if arguments.update then
-                table.insert(args, '-u')
-              end
-              local handle, pid = vim.uv.spawn('moon', {
-                args = args,
-                cwd = arguments.cwdUri:sub(7, -1),
-                stdio = { nil, stdout, stderr }
-              }, function()
-                stdout:close()
-                stderr:close()
-                vim.schedule(function()
-                  vim.api.nvim_buf_call(ev.buf, function()
-                    vim.cmd [[edit]]
-                  end)
-                end)
-                -- print('exit code', code)
-              end)
-              vim.uv.read_start(stdout, function(err, data)
-                assert(not err, err)
-                if not data then
-                  return
-                end
-                local trimmed = trim(data)
-                if trimmed ~= "" then
-                  print(trimmed)
-                end
-              end)
+              execute_moon_test(ev.buf, arguments)
             end,
           },
         }))
