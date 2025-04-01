@@ -149,6 +149,7 @@ return {
     if opts.lsp ~= false then
       local function on_attach(ev)
         setup_toggle_multiline_string(ev.buf)
+        vim.cmd[[compiler moon]]
         vim.lsp.start(vim.tbl_deep_extend("keep", opts.lsp or {}, {
           name = 'moonbit-lsp',
           cmd = { find_lsp_server() },
