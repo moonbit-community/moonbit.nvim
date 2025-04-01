@@ -207,8 +207,8 @@ return {
         group = moonbit_lsp_group,
         callback = on_attach,
       })
-      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-        pattern = { '*.mbt', 'moon.pkg.json', 'moon.mod.json', },
+      vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+        pattern = { 'moon.pkg.json', 'moon.mod.json', },
         group = moonbit_lsp_group,
         callback = on_attach,
       })
