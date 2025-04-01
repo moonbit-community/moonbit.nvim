@@ -23,8 +23,7 @@ CompilerSet errorformat=%EError:\ [%n],
       \%-C%.%#╭─[%f:%l:%c],
       \%C%.%#│%.%#╰─%#\ %m,
       \%-C%.%#│%.%#,
-      \%-C─%#╯,
-      \%-G%.%#
+      \%-C─%#╯
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
