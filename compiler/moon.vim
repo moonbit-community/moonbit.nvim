@@ -16,9 +16,14 @@ let s:cpo_save = &cpo
 set cpo&vim
 
 CompilerSet makeprg=moon\ $*
-CompilerSet errorformat=%W%f:%l:%c-%e:%k\ Warning\ %n:\ %m,
-      \%E%f:%l:%c-%e:%k\ %m,
-      \%C%m,
+CompilerSet errorformat=%EError:\ [%n],
+      \%WWarning:\ [%n],
+      \%W%f:%l:%c-%e:%k\ [E%n]\ Warning:\ %m,
+      \%E%f:%l:%c-%e:%k\ [E%n]\ %m,
+      \%-C%.%#╭─[%f:%l:%c],
+      \%C%.%#│%.%#╰─%#\ %m,
+      \%-C%.%#│%.%#,
+      \%-C─%#╯,
       \%-G%.%#
 
 let &cpo = s:cpo_save
