@@ -237,6 +237,9 @@
 ;; Comments
 
 (comment) @comment @spell
+(((comment) @comment @conceal)
+ (#match? @comment "^///\\|$")
+ (#set! conceal_lines ""))
 (docstring) @comment.documentation @spell
 
 ;; Errors
