@@ -12,8 +12,8 @@
 
 (parameter (parameter_label) @variable.parameter)
 (parameter (lowercase_identifier) @variable.parameter)
-((parameter (lowercase_identifier) @variable.builtin)
- (#any-of? @variable.builtin
+((parameter (lowercase_identifier) @variable.parameter.builtin)
+ (#any-of? @variable.parameter.builtin
            "self"))
 
 (pattern (simple_pattern (lowercase_identifier) @variable))
@@ -28,12 +28,23 @@
 
 (let_mut_expression (lowercase_identifier) @variable)
 
+(for_in_expression (for_keyword) (lowercase_identifier) @variable "in")
+
+(for_binder (lowercase_identifier) @variable)
+
+; Constructors
+
+(enum_constructor) @constructor
+(constructor_expression (uppercase_identifier) @constructor)
+(constructor_expression (dot_uppercase_identifier) @constructor)
+
 ; Constants
 
 (const_definition (uppercase_identifier) @constant)
-
-; ((qualified_identifier (dot_lowercase_identifier) @constant)
-;  (#lua-match? @constant "^\.[A-Z]"))
+((constructor_expression (uppercase_identifier) @constant)
+ (#match? @constant "^[A-Z][A-Z_]+$"))
+((constructor_expression (dot_uppercase_identifier) @constant)
+ (#match? @constant "^\.[A-Z][A-Z_]+$"))
 
 ;; Types
 
@@ -41,7 +52,6 @@
 
 (type_identifier) @type
 (qualified_type_identifier) @type
-(constructor_expression (uppercase_identifier) @type)
 
 ; Type definitions
 
@@ -49,8 +59,13 @@
 (struct_definition (identifier) @type.definition)
 (type_definition (identifier) @type.definition)
 (trait_definition (identifier) @type.definition)
-(type_alias_definition (identifier) @type.definition)
+(type_alias_targets (identifier) @type.definition)
+(type_alias_targets (dot_identifier) @type.definition)
+(type_alias_target (identifier) @type.definition)
 (error_type_definition (identifier) @type.definition)
+(trait_alias_targets (identifier) @type.definition)
+(trait_alias_targets (dot_identifier) @type.definition)
+(trait_alias_target (identifier) @type.definition)
 
 ; Builtin types
 
@@ -59,6 +74,8 @@
            "Unit"
            "Bool"
            "Byte"
+           "Int16"
+           "UInt16"
            "Int"
            "UInt"
            "Int64"
@@ -72,37 +89,51 @@
            "Error"
            "Self"))
 
-; Constructors
-
-(enum_constructor) @constant
-
-(constructor_expression (uppercase_identifier) @constant)
-
 ; Fields
 
-(struct_field_declaration (lowercase_identifier) @field)
-(struct_field_expression (labeled_expression (lowercase_identifier) @field))
-(struct_field_expression (labeled_expression_pun (lowercase_identifier) @field))
-(struct_field_expression (labeled_expression (lowercase_identifier) @field))
-(struct_field_expression (labeled_expression_pun (lowercase_identifier) @field))
-(struct_pattern (struct_field_pattern (labeled_pattern (lowercase_identifier) @field)))
-(struct_pattern (struct_field_pattern (labeled_pattern_pun (lowercase_identifier) @field)))
-(access_expression (accessor (dot_identifier) @field))
+(struct_field_declaration (lowercase_identifier) @variable.member)
+(struct_expression (labeled_expression (lowercase_identifier) @variable.member))
+(struct_expression (labeled_expression_pun (lowercase_identifier) @variable.member))
+(struct_expression (labeled_expression (lowercase_identifier) @variable.member))
+(struct_expression (labeled_expression_pun (lowercase_identifier) @variable.member))
+(struct_field_expression (labeled_expression (lowercase_identifier) @variable.member))
+(struct_field_expression (labeled_expression_pun (lowercase_identifier) @variable.member))
+(struct_field_expression (labeled_expression (lowercase_identifier) @variable.member))
+(struct_field_expression (labeled_expression_pun (lowercase_identifier) @variable.member))
+(struct_pattern (struct_field_pattern (labeled_pattern (lowercase_identifier) @variable.member)))
+(struct_pattern (struct_field_pattern (labeled_pattern_pun (lowercase_identifier) @variable.member)))
+(access_expression (accessor (dot_identifier) @variable.member))
+
+; Attributes
+
+(attribute) @attribute
+((attribute) @attribute.builtin
+ (#eq? @attribute.builtin
+          "#coverage.skip"))
+((attribute) @attribute.builtin
+ (#match? @attribute.builtin
+          "^#deprecated\\(.*\\)"))
 
 ;; Functions
 
 ; Function calls
 
-(apply_expression (simple_expression (qualified_identifier) @function.call))
+(apply_expression (simple_expression (qualified_identifier (lowercase_identifier) @function.call)))
+(apply_expression (simple_expression (qualified_identifier (dot_lowercase_identifier) @function.call)))
 
 ; Method calls
 
 (method_expression (lowercase_identifier) @function.method.call)
 (dot_apply_expression (dot_identifier) @function.method.call)
+(dot_dot_apply_expression (dot_dot_identifier) @function.method.call)
 
 ; Function definitions
 
 (function_definition (function_identifier (lowercase_identifier) @function))
+(function_alias_targets (lowercase_identifier) @function)
+(function_alias_targets (dot_lowercase_identifier) @function)
+(function_alias_targets (dot_lowercase_identifier) @function)
+(function_alias_target (lowercase_identifier) @function)
 (trait_method_declaration (function_identifier) @function)
 (impl_definition (function_identifier) @function)
 
@@ -120,19 +151,20 @@
 
 [
 	"+" "-" "*" "/" "%"
-  "="
+  "<<" ">>" "|" "&" "^"
+  "=" (equal) (plus_equal) (minus_equal) (asterisk_equal) (slash_equal) (percent_equal)
   "<" ">" ">=" "<=" "==" "!="
   "&&" "||"
   "=>" "->"
-  "!" "!!"
+  "!" "!!" (question_operator)
 ] @operator
 
 ;; Keywords
 
-(mutability) @keyword.modifier
+[ (mutability) "mut" ] @keyword.modifier
 
 [
-  "struct" "enum" "type" "trait" "typealias"
+  "struct" "enum" "type" "trait" "typealias" "traitalias"
 ] @keyword.type
 
 [
@@ -140,15 +172,15 @@
 ] @keyword.modifier
 
 [
-  "guard" "let" "mut" "const"
-  "with"
+  "guard" "let" "const"
+  "with" "as" (is_keyword)
 ] @keyword
 
 (derive_keyword) @keyword
 
-[ "fn" "test" "impl" ] @keyword.function
+[ "fn" "test" "impl" "fnalias" ] @keyword.function
 "return" @keyword.return
-[ "while" "loop" (for_keyword) "break" "continue" "in" ] @repeat
+[ "while" "loop" (for_keyword) "break" "continue" "in" ] @keyword.repeat
 
 [
   "if"
@@ -172,6 +204,14 @@
 (dot) @punctuation.delimiter
 (dot_dot) @punctuation.delimiter
 
+(array_sub_pattern (dot_dot)) @operator
+(dot_dot_apply_expression (dot_dot_identifier (dot_dot) @punctuation.delimiter))
+
+[
+ (dot_dot_lt)
+ (dot_dot_eq)
+] @operator
+
 [
   "(" ")"
   "{" "}"
@@ -192,6 +232,7 @@
 (integer_literal) @number
 (float_literal) @number.float
 (boolean_literal) @boolean
+(char_literal) @character
 
 ;; Comments
 
