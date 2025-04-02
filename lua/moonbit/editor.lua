@@ -112,5 +112,6 @@ return {
   },
   on_attach = function(bufnr)
     setup_toggle_multiline_string(bufnr)
+    vim.cmd [[syntax match MoonBitBlockLine "///| "ms=s+3 conceal cchar= ]]
   end
 }
