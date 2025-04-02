@@ -1,7 +1,3 @@
-local trim = function(s)
-  return s:gsub('^%s*(.-)%s*$', '%1')
-end
-
 ---@param lines string[]
 local function remove_multiline_string(lines)
   local result = {}
