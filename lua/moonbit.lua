@@ -39,7 +39,7 @@ return {
       callback = on_attach,
     })
     vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
-      pattern = { 'moon.pkg.json', 'moon.mod.json', },
+      pattern = { '*.mbt.md', 'moon.pkg.json', 'moon.mod.json', },
       group = moonbit_augroup,
       callback = on_attach,
     })
