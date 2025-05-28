@@ -10,9 +10,20 @@
 
 ; Variables
 
-(parameter (parameter_label) @variable.parameter)
-(parameter (lowercase_identifier) @variable.parameter)
-((parameter (lowercase_identifier) @variable.parameter.builtin)
+(positional_parameter (lowercase_identifier) @variable.parameter)
+(labelled_parameter (label (lowercase_identifier)) @variable.parameter)
+(optional_parameter (optional_label (lowercase_identifier)) @variable.parameter)
+(optional_parameter_with_default (label (lowercase_identifier)) @variable.parameter)
+((positional_parameter (lowercase_identifier) @variable.parameter.builtin)
+ (#any-of? @variable.parameter.builtin
+           "self"))
+((labelled_parameter (label (lowercase_identifier)) @variable.parameter.builtin)
+ (#any-of? @variable.parameter.builtin
+           "self"))
+((optional_parameter (optional_label (lowercase_identifier)) @variable.parameter.builtin)
+ (#any-of? @variable.parameter.builtin
+           "self"))
+((optional_parameter_with_default (label (lowercase_identifier)) @variable.parameter.builtin)
  (#any-of? @variable.parameter.builtin
            "self"))
 
@@ -28,7 +39,7 @@
 
 (let_mut_expression (lowercase_identifier) @variable)
 
-(for_in_expression (for_keyword) (lowercase_identifier) @variable "in")
+(for_in_expression "for" (lowercase_identifier) @variable "in")
 
 (for_binder (lowercase_identifier) @variable)
 
@@ -118,8 +129,9 @@
 
 ; Function calls
 
-(apply_expression (simple_expression (qualified_identifier (lowercase_identifier) @function.call)))
-(apply_expression (simple_expression (qualified_identifier (dot_lowercase_identifier) @function.call)))
+(apply_expression (lowercase_identifier) @function.call)
+(apply_expression (qualified_identifier (lowercase_identifier) @function.call))
+(apply_expression (qualified_identifier (dot_lowercase_identifier) @function.call))
 
 ; Method calls
 
@@ -144,19 +156,19 @@
 ;; Labels
 
 (loop_label) @label
-("continue" (parameter_label) @label)
-("break" (parameter_label) @label)
+("continue" (label) @label)
+("break" (label) @label)
 
 ;; Operators
 
 [
 	"+" "-" "*" "/" "%"
   "<<" ">>" "|" "&" "^"
-  "=" (equal) (plus_equal) (minus_equal) (asterisk_equal) (slash_equal) (percent_equal)
+  "=" "+=" "-=" "*=" "/=" "%="
   "<" ">" ">=" "<=" "==" "!="
   "&&" "||"
   "=>" "->"
-  "!" "!!" (question_operator)
+  "!" "!!" "?"
 ] @operator
 
 ;; Keywords
@@ -173,14 +185,14 @@
 
 [
   "guard" "let" "const"
-  "with" "as" (is_keyword)
+  "with" "as" "is"
 ] @keyword
 
-(derive_keyword) @keyword
+"derive" @keyword
 
 [ "fn" "test" "impl" "fnalias" ] @keyword.function
 "return" @keyword.return
-[ "while" "loop" (for_keyword) "break" "continue" "in" ] @keyword.repeat
+[ "while" "loop" "for" "break" "continue" "in" ] @keyword.repeat
 
 [
   "if"
@@ -199,17 +211,17 @@
   ","
 ] @punctuation.delimiter
 
-(colon) @punctuation.delimiter
-(colon_colon) @punctuation.delimiter
-(dot) @punctuation.delimiter
-(dot_dot) @punctuation.delimiter
+":" @punctuation.delimiter
+"::" @punctuation.delimiter
+"." @punctuation.delimiter
+".." @punctuation.delimiter
 
-(array_sub_pattern (dot_dot)) @operator
-(dot_dot_apply_expression (dot_dot_identifier (dot_dot) @punctuation.delimiter))
+(array_sub_pattern "..") @operator
+(dot_dot_apply_expression (dot_dot_identifier ".." @punctuation.delimiter))
 
 [
- (dot_dot_lt)
- (dot_dot_eq)
+ "..<"
+ "..="
 ] @operator
 
 [
@@ -237,10 +249,7 @@
 ;; Comments
 
 (comment) @comment @spell
-(((comment) @comment @conceal)
- (#match? @comment "^///\\|$")
- (#set! conceal_lines ""))
-(docstring) @comment.documentation @spell
+; (docstring) @comment.documentation @spell
 
 ;; Errors
 

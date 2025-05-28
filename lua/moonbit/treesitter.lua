@@ -1,7 +1,7 @@
 local install_infos = {
   ['moonbit'] = {
     url = 'https://github.com/moonbitlang/tree-sitter-moonbit',
-    revision = '8c17b59f16adaf87813972df0cbf193825825f47',
+    revision = 'd8e16ae8edd42a62f8e45e1a3b621f9c1b2661fc',
     files = { 'src/parser.c', 'src/scanner.c' },
     branch = 'main',
   },
