@@ -1,5 +1,6 @@
 local editor = require 'moonbit.editor'
 local compiler = require 'moonbit.compiler'
+local target = require 'moonbit.target'
 
 return {
   api = {
@@ -43,5 +44,7 @@ return {
       group = moonbit_augroup,
       callback = on_attach,
     })
+
+    target.setup_moonbit_target()
   end
 }
