@@ -87,6 +87,25 @@ According to the [lazy.nvim docs](https://lazy.folke.io/usage/structuring#%EF%B8
 ```
 
 ## Mooncake integration
-`moonbit.nvim` provides package name completion and version hint in `moon.mod.json`.
+`moonbit.nvim` provides package name completion and version hint in `moon.mod.json`
+Only `blink.cmp` is supported at the moment:
+```lua
+{
+  "saghen/blink.cmp",
+  opts = {
+    sources = {
+      -- add mooncake to your completion providers
+      default = { "mooncake", "lsp", "path", "snippets", "buffer" },
+      providers = {
+        mooncake = {
+          name   = 'Mooncakes',
+          module = 'moonbit.mooncakes.completion.blink',
+          opts   = { max_items = 100 },
+        },
+      },
+    },
+  },
+}
+```
 
 A command `:MooncakeActions` is also available to easily update dependency version and open documentaion in your browser.
