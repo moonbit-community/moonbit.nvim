@@ -7,8 +7,10 @@ local URL        = "https://mooncakes.io/assets/modules.json"
 local CACHE_TTL  = 60 * 60
 local MAX_RESULT = 50
 
-local cache_dir  = fn.stdpath("cache") .. "/mooncakes"
-local cache_file = cache_dir .. "/modules.json"
+local path_sep = package.config:sub(1, 1)
+
+local cache_dir  = fn.stdpath("cache") .. path_sep .. "mooncakes"
+local cache_file = cache_dir .. path_sep .. "modules.json"
 
 ---@class MooncakeEntry
 ---@field name        string

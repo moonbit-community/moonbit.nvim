@@ -1,5 +1,6 @@
 local semver     = require("moonbit.mooncakes.util.semver")
 local fn         = vim.fn
+local path_sep = package.config:sub(1, 1)
 
 ---@class MooncakeEntry
 ---@field name        string
@@ -39,10 +40,18 @@ end
 
 local function load_local_entries()
   local entries = {}
-  local base = fn.expand("~/.moon/registry/index/user")
-  local creators = fn.glob(base .. "/*", true, true)
+  local moon_home = vim.env["MOON_HOME"]
+  if moon_home == nil then
+    local home = vim.env["HOME"]
+    if home == nil then
+      home = '~'
+    end
+    moon_home = home .. path_sep .. '.moon'
+  end
+  local base = fn.expand(moon_home .. path_sep .. "registry" .. path_sep .. "index" .. path_sep .. "user")
+  local creators = fn.glob(base .. path_sep .. "*", true, true)
   for _, creator_path in ipairs(creators) do
-    local files = fn.glob(creator_path .. "/*.index", true, true)
+    local files = fn.glob(creator_path .. path_sep .. "*.index", true, true)
     for _, path in ipairs(files) do
       local fh = io.open(path, "r")
       if fh then

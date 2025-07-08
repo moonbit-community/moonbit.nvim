@@ -1,10 +1,11 @@
-local api     = require("moonbit.mooncakes.api")
-local semver  = require("moonbit.mooncakes.util.semver")
-local M       = {}
+local api          = require("moonbit.mooncakes.api")
+local semver       = require("moonbit.mooncakes.util.semver")
+local collect_deps = require("moonbit.mooncakes.util.collect_deps").collect_deps
+local M            = {}
 
-local ns      = vim.api.nvim_create_namespace("MooncakesVirt")
+local ns           = vim.api.nvim_create_namespace("MooncakesVirt")
 
-local symbols = {
+local symbols      = {
   up    = "󰄬",
   minor = "󰅗",
   major = "󰛨",
@@ -21,35 +22,6 @@ define("MooncakesUpToDate", "DiagnosticOk")
 define("MooncakesMinor", "DiagnosticHint")
 define("MooncakesMajor", "DiagnosticWarn")
 define("MooncakesError", "DiagnosticError")
-
-local function collect_deps(bufnr)
-  local res, in_deps, depth = {}, false, 0
-  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-
-  for i, line in ipairs(lines) do
-    if not in_deps then
-      if line:match('"deps"%s*:%s*{') then
-        in_deps, depth = true, 1
-      end
-    else
-      depth = depth
-          + select(2, line:gsub("{", ""))
-          - select(2, line:gsub("}", ""))
-      if depth <= 0 then
-        in_deps = false
-      end
-    end
-
-    if in_deps then
-      local pkg, ver, key_start = line:match('^%s*"([^"]+)"%s*:%s*"([^"]+)"()')
-      if pkg and ver then
-        res[pkg] = { lnum = i - 1, version = ver }
-      end
-    end
-  end
-
-  return res
-end
 
 local function render_buf(bufnr)
   vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)

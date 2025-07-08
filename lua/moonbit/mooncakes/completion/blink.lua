@@ -46,7 +46,6 @@ function source:get_completions(ctx, callback)
   end
 
   local query = ctx:get_keyword() or ""
-  vim.notify("Searching for Mooncakes packages matching: " .. query, vim.log.levels.INFO)
 
   local items = {}
   for _, pkg in ipairs(api.search(query)) do
