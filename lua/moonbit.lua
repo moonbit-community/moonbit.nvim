@@ -2,6 +2,8 @@ local editor = require 'moonbit.editor'
 local compiler = require 'moonbit.compiler'
 local target = require 'moonbit.target'
 
+local mooncakes = require 'moonbit.mooncakes'
+
 return {
   api = {
     editor = editor,
@@ -46,5 +48,13 @@ return {
     })
 
     target.setup_moonbit_target()
+
+    do
+      local mc = opts.mooncakes or {}
+      mooncakes.setup {
+        use_local = mc.use_local ~= false,
+        virtual_text = mc.virtual_text ~= false,
+      }
+    end
   end
 }

@@ -30,6 +30,10 @@ the MoonBit language.
   'moonbit-community/moonbit.nvim',
   ft = { 'moonbit' },
   opts = {
+    mooncakes = {
+      virtual_text = true,   -- virtual text showing suggestions
+      use_local = true,      -- recommended, use index under ~/.moon
+    },
     -- optionally disable the treesitter integration
     treesitter =  {
       enabled = true,
