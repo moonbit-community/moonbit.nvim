@@ -85,3 +85,8 @@ According to the [lazy.nvim docs](https://lazy.folke.io/usage/structuring#%EF%B8
   end,
 }
 ```
+
+## Mooncake integration
+`moonbit.nvim` provides package name completion and version hint in `moon.mod.json`.
+
+A command `:MooncakeActions` is also available to easily update dependency version and open documentaion in your browser.

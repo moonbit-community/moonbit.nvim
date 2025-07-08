@@ -1,4 +1,3 @@
--- lua/moonbit_crates/api/local.lua
 local semver     = require("moonbit.mooncakes.util.semver")
 local fn         = vim.fn
 
