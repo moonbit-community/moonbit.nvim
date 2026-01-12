@@ -23,6 +23,11 @@ First you need to have the MoonBit toolchain installed. You can follow the
 instruction on the [Download Page](https://www.moonbitlang.com/download/) of
 the MoonBit language.
 
+**Requirements:**
+- Neovim 0.11.0 or later (nightly)
+- nvim-treesitter (latest version recommended)
+- MoonBit toolchain
+
 ### `lazy.nvim`
 
 ```lua
