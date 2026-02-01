@@ -7,7 +7,7 @@ return {
           tier = 2,
           install_info = {
             url = 'https://github.com/moonbitlang/tree-sitter-moonbit',
-            revision = 'd8e16ae8edd42a62f8e45e1a3b621f9c1b2661fc',
+            revision = '85938537ea369d271c0a3f7d472ad4e490cd0d94',
             files = { 'src/parser.c', 'src/scanner.c' },
             branch = 'main',
           },
