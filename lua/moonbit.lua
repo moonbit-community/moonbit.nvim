@@ -1,6 +1,7 @@
 local editor = require 'moonbit.editor'
 local compiler = require 'moonbit.compiler'
 local target = require 'moonbit.target'
+local jsonls = require 'moonbit.jsonls'
 
 local mooncakes = require 'moonbit.mooncakes'
 
@@ -25,6 +26,8 @@ return {
     if opts.lsp ~= false then
       lsp = require('moonbit.lsp')
     end
+
+    jsonls.setup(opts.jsonls)
 
     local function on_attach(ev)
       editor.on_attach(ev.buf)

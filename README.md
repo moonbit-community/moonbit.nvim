@@ -13,7 +13,7 @@ Neovim support for the [MoonBit language](https://www.moonbitlang.com).
 - [x] Build system support
   - [x] Compiler plugin
   - [x] ~Diagnostics through [nvim-lint](https://github.com/mfussenegger/nvim-lint)~ Removed b/c LSP
-- [ ] JSON Schema
+- [x] JSON Schema
 - [x] Language server
 - [x] Neotest support ([#10](https://github.com/moonbit-community/moonbit.nvim/pull/10))
 
@@ -47,10 +47,17 @@ the MoonBit language.
       on_attach = function(client, bufnr) end,
       -- provide client capabilities to pass to the language server
       capabilities = vim.lsp.protocol.make_client_capabilities(),
-    }
+    },
+    -- configure jsonls schema integration (enabled by default)
+    -- set `jsonls = false` to disable
+    jsonls = {
+      -- optional extra jsonls settings to merge
+      settings = {},
+    },
   },
 }
 ```
+
 ## neotest
 
 `moonbit.nvim` provides a [neotest](https://github.com/nvim-neotest/neotest) adapter. Below is an minimal example config using `lazy.nvim`:
@@ -87,8 +94,10 @@ According to the [lazy.nvim docs](https://lazy.folke.io/usage/structuring#%EF%B8
 ```
 
 ## Mooncake integration
+
 `moonbit.nvim` provides package name completion and version hint in `moon.mod.json`
 Only `blink.cmp` is supported at the moment:
+
 ```lua
 {
   "saghen/blink.cmp",
@@ -109,3 +118,17 @@ Only `blink.cmp` is supported at the moment:
 ```
 
 A command `:MooncakeActions` is also available to easily update dependency version and open documentaion in your browser.
+
+## JSON Schema
+
+`moonbit.nvim` registers local JSON schemas for `moon.mod.json` and
+`moon.pkg.json` with `jsonls` automatically. To disable:
+
+```lua
+{
+  'moonbit-community/moonbit.nvim',
+  opts = {
+    jsonls = false,
+  },
+}
+```
