@@ -27,7 +27,13 @@
  (#any-of? @variable.parameter.builtin
            "self"))
 
-(pattern (simple_pattern (lowercase_identifier) @variable))
+(tuple_pattern (lowercase_identifier) @variable)
+(constructor_pattern_argument . (lowercase_identifier) @variable .)
+(constructor_pattern_argument "=" (lowercase_identifier) @variable)
+(constructor_pattern_argument (label (lowercase_identifier) @variable))
+(case_clause (lowercase_identifier) @variable "=>")
+(matrix_case_clause (lowercase_identifier) @variable "=>")
+(let_expression (lowercase_identifier) @variable)
 
 (qualified_identifier (lowercase_identifier) @variable)
 ((qualified_identifier (lowercase_identifier) @variable.builtin)
@@ -36,11 +42,8 @@
 (qualified_identifier (dot_lowercase_identifier) @variable)
 
 (value_definition (lowercase_identifier) @variable)
-
 (let_mut_expression (lowercase_identifier) @variable)
-
 (for_in_expression "for" (lowercase_identifier) @variable "in")
-
 (for_binder (lowercase_identifier) @variable)
 
 ; Constructors
@@ -100,6 +103,16 @@
            "Error"
            "Self"))
 
+((qualified_type_identifier) @type.builtin
+ (#any-of? @type.builtin
+           "Eq"
+           "Compare"
+           "Hash"
+           "Show"
+           "Default"
+           "ToJson"
+           "FromJson"))
+
 ; Fields
 
 (struct_field_declaration (lowercase_identifier) @variable.member)
@@ -114,6 +127,8 @@
 (struct_pattern (struct_field_pattern (labeled_pattern (lowercase_identifier) @variable.member)))
 (struct_pattern (struct_field_pattern (labeled_pattern_pun (lowercase_identifier) @variable.member)))
 (access_expression (accessor (dot_identifier) @variable.member))
+(constructor_pattern_argument (lowercase_identifier) @variable.member "=")
+(apply_expression (constructor_expression) (arguments (argument (labelled_argument (lowercase_identifier) @variable.member "="))))
 
 ; Attributes
 
@@ -129,7 +144,6 @@
 
 ; Function calls
 
-(apply_expression (lowercase_identifier) @function.call)
 (apply_expression (qualified_identifier (lowercase_identifier) @function.call))
 (apply_expression (qualified_identifier (dot_lowercase_identifier) @function.call))
 
@@ -167,6 +181,7 @@
   "=" "+=" "-=" "*=" "/=" "%="
   "<" ">" ">=" "<=" "==" "!="
   "&&" "||"
+  "|>"
   "=>" "->"
   "!" "!!" "?"
 ] @operator
@@ -176,7 +191,7 @@
 [ (mutability) "mut" ] @keyword.modifier
 
 [
-  "struct" "enum" "type" "trait" "typealias" "traitalias"
+  "struct" "enum" "type" "trait" "typealias" "traitalias" "suberror"
 ] @keyword.type
 
 [
@@ -184,11 +199,13 @@
 ] @keyword.modifier
 
 [
-  "guard" "let" "const"
-  "with" "as" "is"
+  "guard" "let" "letrec" "and" "const"
+  "with" "as" "is" "lexmatch?" "using" "longest"
 ] @keyword
 
 "derive" @keyword
+
+[ "package" "import" ] @keyword.import
 
 [ "fn" "test" "impl" "fnalias" ] @keyword.function
 "return" @keyword.return
@@ -203,6 +220,19 @@
 "async" @keyword.coroutine
 
 [ "try" "raise" "catch" ] @keyword.exception
+
+[ "noraise" ] @keyword.exception
+
+((lowercase_identifier) @keyword
+ (#any-of? @keyword
+           "import"
+           "using"
+           "defer"
+           "lexmatch"
+           "recur"))
+
+((lowercase_identifier) @keyword.exception
+ (#eq? @keyword.exception "except"))
 
 ;; Delimiters
 
@@ -220,8 +250,11 @@
 (dot_dot_apply_expression (dot_dot_identifier ".." @punctuation.delimiter))
 
 [
- "..<"
- "..="
+  "..<"
+  "..="
+  "..<="
+  "..>"
+  "..>="
 ] @operator
 
 [
