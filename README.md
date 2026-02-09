@@ -96,7 +96,7 @@ According to the [lazy.nvim docs](https://lazy.folke.io/usage/structuring#%EF%B8
 ## Mooncake integration
 
 `moonbit.nvim` provides package name completion and version hint in `moon.mod.json`
-Only `blink.cmp` is supported at the moment:
+`blink.cmp` setup:
 
 ```lua
 {
@@ -117,7 +117,23 @@ Only `blink.cmp` is supported at the moment:
 }
 ```
 
-A command `:MooncakeActions` is also available to easily update dependency version and open documentaion in your browser.
+`nvim-cmp` setup:
+
+```lua
+{
+  "hrsh7th/nvim-cmp",
+  dependencies = {
+    "moonbit-community/moonbit.nvim",
+  },
+  opts = function(_, opts)
+    opts.sources = require("cmp").config.sources(opts.sources or {}, {
+      { name = "mooncake", option = { max_items = 100 } },
+    })
+  end,
+}
+```
+
+A command `:MooncakeActions` is also available to easily update dependency version and open documentation in your browser.
 
 ## JSON Schema
 
