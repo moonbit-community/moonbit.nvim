@@ -93,9 +93,12 @@ According to the [lazy.nvim docs](https://lazy.folke.io/usage/structuring#%EF%B8
 }
 ```
 
+The neotest adapter recognizes package config from `moon.pkg` and `moon.pkg.json` (prefers `moon.pkg` when both are present).
+
 ## Mooncake integration
 
-`moonbit.nvim` provides package name completion and version hint in `moon.mod.json`
+`moonbit.nvim` provides package name completion in `moon.mod.json` and `moon.pkg`.
+Version hints and version upgrades are available in `moon.mod.json`.
 `blink.cmp` setup:
 
 ```lua
@@ -133,12 +136,12 @@ According to the [lazy.nvim docs](https://lazy.folke.io/usage/structuring#%EF%B8
 }
 ```
 
-A command `:MooncakeActions` is also available to easily update dependency version and open documentation in your browser.
+A command `:MooncakeActions` is also available to open package docs in `moon.pkg`, and to update dependency versions in `moon.mod.json`.
 
 ## JSON Schema
 
 `moonbit.nvim` registers local JSON schemas for `moon.mod.json` and
-`moon.pkg.json` with `jsonls` automatically. To disable:
+`moon.pkg.json` with `jsonls` automatically. (`moon.pkg` is a DSL file, not JSON.) To disable:
 
 ```lua
 {

@@ -1,6 +1,8 @@
 local lib = require("neotest.lib")
 local types = require("neotest.types")
 local logger = require("neotest.logging")
+local package_files = require("moonbit.util.package_files")
+local moon_pkg = require("moonbit.util.moon_pkg")
 
 local jsonlist = require("neotest-moonbit.json")
 
@@ -16,7 +18,6 @@ end
 local M = {}
 
 local MOON_MOD_JSON = "moon.mod.json"
-local MOON_PKG_JSON = "moon.pkg.json"
 
 M.Adapter = { name = "neotest-moonbit" }
 
@@ -36,16 +37,51 @@ end
 local function readJSON(path)
   local f, err = io.open(path, "r")
   if err or f == nil then
-    logger.error("Failed to read " .. path)
     return nil
   end
   local content = f:read("*a")
+  f:close()
   local ok, json = pcall(vim.json.decode, content)
   if not ok then
     logger.error("Failed to parse " .. path)
     return nil
   end
   return json
+end
+
+---@param path string
+---@return string|nil
+local function read_file(path)
+  local f, err = io.open(path, "r")
+  if err or f == nil then
+    return nil
+  end
+  local content = f:read("*a")
+  f:close()
+  return content
+end
+
+---@param pkg_dir string
+---@return boolean|nil
+local function read_is_main(pkg_dir)
+  local pkg_path, filename = package_files.find_package_file(pkg_dir)
+  if pkg_path == nil then
+    return nil
+  end
+
+  if filename == package_files.MOON_PKG_JSON then
+    local pkg_json = readJSON(pkg_path)
+    if pkg_json == nil then
+      return nil
+    end
+    return pkg_json["is-main"] == true or pkg_json["is_main"] == true
+  end
+
+  local content = read_file(pkg_path)
+  if content == nil then
+    return nil
+  end
+  return moon_pkg.parse_is_main(content)
 end
 
 ---Filter directories when searching for test files
@@ -77,12 +113,12 @@ function M.Adapter.filter_dir(name, rel_path, root)
   -- let's check if this is a main package or not
   -- at the time of writing (2024-10-28), main package can't run tests.
 
-  local moon_pkg_path = joinpath(rel_path, MOON_PKG_JSON)
-  local moon_pkg_json = readJSON(moon_pkg_path)
-  if not moon_pkg_json then
+  local pkg_dir = joinpath(root, rel_path)
+  local is_main = read_is_main(pkg_dir)
+  if is_main == nil then
     return false
   end
-  return not moon_pkg_json["is-main"]
+  return not is_main
 end
 
 ---@async

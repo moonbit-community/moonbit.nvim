@@ -3,12 +3,13 @@ local act  = require("moonbit.mooncakes.actions")
 
 local function setup_ui(enable_ui)
   vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-    pattern  = "moon.mod.json",
+    pattern  = { "moon.mod.json", "moon.pkg" },
     group    = vim.api.nvim_create_augroup("Mooncakes", { clear = false }),
     callback = function()
       local buf = vim.api.nvim_get_current_buf()
       act.attach(buf)
-      if enable_ui then
+      local filename = vim.fs.basename(vim.api.nvim_buf_get_name(buf))
+      if enable_ui and filename == "moon.mod.json" then
         virt.attach(buf)
       end
     end,

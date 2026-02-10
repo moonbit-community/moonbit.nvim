@@ -4,6 +4,7 @@ local source = {}
 
 local api    = require("moonbit.mooncakes.api")
 local types  = require("blink.cmp.types")
+local moon_pkg = require("moonbit.util.moon_pkg")
 
 function source.new(opts)
   opts = opts or {}
@@ -12,7 +13,8 @@ function source.new(opts)
 end
 
 function source:enabled()
-  return vim.fn.expand("%:t") == "moon.mod.json"
+  local filename = vim.fn.expand("%:t")
+  return filename == "moon.mod.json" or filename == "moon.pkg"
 end
 
 local function inside_deps(bufnr, row)
@@ -38,9 +40,17 @@ end
 function source:get_completions(ctx, callback)
   local cursor = ctx:get_cursor()
   local row = cursor[1] - 1
+  local filename = vim.fs.basename(vim.api.nvim_buf_get_name(ctx.bufnr))
   -- local col = cursor[2] - 1
 
-  if not inside_deps(ctx.bufnr, row) then
+  local in_scope = false
+  if filename == "moon.mod.json" then
+    in_scope = inside_deps(ctx.bufnr, row)
+  elseif filename == "moon.pkg" then
+    in_scope = moon_pkg.in_import_block(ctx.bufnr, row)
+  end
+
+  if not in_scope then
     ---@diagnostic disable-next-line: missing-return-value
     return callback({ items = {}, is_incomplete_forward = false, is_incomplete_backward = false })
   end

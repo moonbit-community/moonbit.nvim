@@ -1,4 +1,5 @@
 local api = require("moonbit.mooncakes.api")
+local moon_pkg = require("moonbit.util.moon_pkg")
 
 local source = {}
 
@@ -11,7 +12,8 @@ source.new = function()
 end
 
 function source:is_available()
-  return vim.fn.expand("%:t") == "moon.mod.json"
+  local filename = vim.fn.expand("%:t")
+  return filename == "moon.mod.json" or filename == "moon.pkg"
 end
 
 function source:get_debug_name()
@@ -57,8 +59,16 @@ end
 function source:complete(params, callback)
   local opts = self:_validate_options(params)
   local row = params.context.cursor.row - 1
+  local filename = vim.fs.basename(vim.api.nvim_buf_get_name(params.context.bufnr))
 
-  if not inside_deps(params.context.bufnr, row) then
+  local in_scope = false
+  if filename == "moon.mod.json" then
+    in_scope = inside_deps(params.context.bufnr, row)
+  elseif filename == "moon.pkg" then
+    in_scope = moon_pkg.in_import_block(params.context.bufnr, row)
+  end
+
+  if not in_scope then
     callback({ items = {}, isIncomplete = false })
     return
   end

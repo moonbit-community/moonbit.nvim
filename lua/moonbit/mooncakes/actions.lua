@@ -2,39 +2,46 @@ local api    = require("moonbit.mooncakes.api")
 local semver = require("moonbit.mooncakes.util.semver")
 local url    = require("moonbit.mooncakes.util.openurl")
 local virt   = require("moonbit.mooncakes.virtualtext")
+local collect_deps = require("moonbit.mooncakes.util.collect_deps").collect_deps
+local moon_pkg = require("moonbit.util.moon_pkg")
 
 local M      = {}
 
----@param bufnr number?
----@return table<string, {lnum: number, version: string}>
-local function collect_deps(bufnr)
-  bufnr = bufnr or vim.api.nvim_get_current_buf()
-  local res, in_deps, depth = {}, false, 0
-  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+---@return string
+local function current_filename()
+  return vim.fs.basename(vim.api.nvim_buf_get_name(0))
+end
 
-  for idx, line in ipairs(lines) do
-    if not in_deps then
-      if line:match('"deps"%s*:%s*{') then
-        in_deps, depth = true, 1
-      end
-    else
-      depth = depth
-          + select(2, line:gsub("{", ""))
-          - select(2, line:gsub("}", ""))
-      if depth <= 0 then
-        in_deps = false
-      end
-    end
+---@param line string
+---@return string|nil
+---@return string|nil
+local function parse_dep_line(line)
+  return line:match('^%s*"([^"]+)"%s*:%s*"([^"]+)"')
+end
 
-    if in_deps then
-      local name, ver = line:match('^%s*"([^"]+)"%s*:%s*"([^"]+)"')
-      if name and ver then
-        res[name] = { lnum = idx - 1, version = ver }
-      end
-    end
+local function open_docs(pkg)
+  url.open_url("https://mooncakes.io/docs/" .. pkg)
+end
+
+local function show_pkg_menu(bufnr)
+  local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+  local line = vim.api.nvim_get_current_line()
+  if not moon_pkg.in_import_block(bufnr, row) then
+    vim.notify("mooncakes: not on an import line", vim.log.levels.WARN)
+    return
   end
 
-  return res
+  local pkg = moon_pkg.parse_import_entry(line)
+  if not pkg then
+    vim.notify("mooncakes: not on an import line", vim.log.levels.WARN)
+    return
+  end
+
+  vim.ui.select({ "Open documentation" }, { prompt = ("mooncakes · %s"):format(pkg) }, function(choice)
+    if choice == "Open documentation" then
+      open_docs(pkg)
+    end
+  end)
 end
 
 ---@param row number  -- 0-based
@@ -80,9 +87,14 @@ local function upgrade(pkg, cur, latest, force)
 end
 
 function M.show_menu()
-  local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+  local bufnr = vim.api.nvim_get_current_buf()
+  if current_filename() == "moon.pkg" then
+    show_pkg_menu(bufnr)
+    return
+  end
+
   local line = vim.api.nvim_get_current_line()
-  local pkg, cur = line:match('^%s*"([^"]+)"%s*:%s*"([^"]+)"')
+  local pkg, cur = parse_dep_line(line)
   if not pkg then
     vim.notify("mooncakes: not on a dependency line", vim.log.levels.WARN)
     return
@@ -98,7 +110,7 @@ function M.show_menu()
   vim.ui.select(opts, { prompt = ("mooncakes · %s (%s)"):format(pkg, cur) },
     function(choice)
       if choice == "Open documentation" then
-        url.open_url("https://mooncakes.io/docs/" .. pkg)
+        open_docs(pkg)
       elseif choice == "Update (compatible)" then
         upgrade(pkg, cur, latest, false)
       elseif choice == "Update (breaking)" then
@@ -109,6 +121,11 @@ function M.show_menu()
 end
 
 function M.upgrade_all(opts)
+  if current_filename() == "moon.pkg" then
+    vim.notify("mooncakes: version updates are only available in moon.mod.json", vim.log.levels.WARN)
+    return
+  end
+
   opts = opts or { force = false }
   local deps = collect_deps()
   local changed = 0
@@ -133,13 +150,22 @@ function M.upgrade_all(opts)
   )
 end
 
-function M.attach(bufnr)
-  bufnr = bufnr or vim.api.nvim_get_current_buf()
-  vim.api.nvim_create_user_command("MooncakeActions", M.show_menu, {
+---@param name string
+---@param callback function
+---@param opts table
+local function ensure_user_command(name, callback, opts)
+  if vim.fn.exists(':' .. name) == 2 then
+    return
+  end
+  vim.api.nvim_create_user_command(name, callback, opts)
+end
+
+function M.attach(_)
+  ensure_user_command("MooncakeActions", M.show_menu, {
     nargs = 0,
     desc = "Show Mooncake actions menu",
   })
-  vim.api.nvim_create_user_command("MooncakeUpgradeAll", function() M.upgrade_all { force = false } end, {
+  ensure_user_command("MooncakeUpgradeAll", function() M.upgrade_all { force = false } end, {
     nargs = 0,
     desc = "Mooncake upgrade all (compatible)",
   })
