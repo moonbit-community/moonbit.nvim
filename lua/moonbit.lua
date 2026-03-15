@@ -25,6 +25,8 @@ return {
     local lsp = nil
     if opts.lsp ~= false then
       lsp = require('moonbit.lsp')
+      lsp.setup(opts.lsp)
+      vim.api.nvim_create_user_command('MoonBitLspRestart', lsp.restart, {})
     end
 
     jsonls.setup(opts.jsonls)
@@ -33,7 +35,7 @@ return {
       editor.on_attach(ev.buf)
       compiler.on_attach(ev.buf)
       if lsp ~= nil then
-        lsp.on_attach(ev.buf, opts.lsp)
+        lsp.on_attach(ev.buf)
       end
     end
 

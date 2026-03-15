@@ -203,20 +203,64 @@ local function execute_moon_test(buffer, arguments)
   vim.system(args, { text = true }, on_test_exit)
 end
 
-return {
-  on_attach = function(bufnr, opts)
-    vim.lsp.start(vim.tbl_deep_extend("keep", opts or {}, {
+local commands = {
+  ['moonbit-lsp/test'] = function(command)
+    local arguments = command.arguments[1]
+    execute_moon_test(0, arguments)
+  end,
+  ['moonbit-lsp/hide-mbti'] = execute_mbti_hide,
+  ['moonbit-lsp/unhide-mbti'] = execute_mbti_unhide,
+}
+
+local M = {}
+
+local stored_config = nil
+
+function M.setup(opts)
+  stored_config = vim.tbl_deep_extend("keep", opts or {}, {
+    cmd = { find_lsp_server() },
+    commands = commands,
+  })
+  if vim.lsp and vim.lsp.config then
+    vim.lsp.config('moonbit-lsp', vim.tbl_deep_extend("keep", stored_config, {
+      filetypes = { 'moonbit' },
+      root_markers = { 'moon.mod.json' },
+    }))
+    vim.lsp.enable('moonbit-lsp')
+  end
+end
+
+function M.on_attach(bufnr)
+  if vim.lsp and vim.lsp.config then
+    if vim.bo[bufnr].filetype ~= 'moonbit' then
+      vim.lsp.start({
+        name = 'moonbit-lsp',
+        root_dir = vim.fs.root(bufnr, { 'moon.mod.json' }),
+      })
+    end
+    return
+  end
+  if stored_config then
+    vim.lsp.start(vim.tbl_deep_extend("keep", stored_config, {
       name = 'moonbit-lsp',
-      cmd = { find_lsp_server() },
       root_dir = vim.fs.root(bufnr, { 'moon.mod.json' }),
-      commands = {
-        ['moonbit-lsp/test'] = function(command)
-          local arguments = command.arguments[1]
-          execute_moon_test(bufnr, arguments)
-        end,
-        ['moonbit-lsp/hide-mbti'] = execute_mbti_hide,
-        ['moonbit-lsp/unhide-mbti'] = execute_mbti_unhide,
-      },
     }))
   end
-}
+end
+
+function M.restart()
+  local clients = vim.lsp.get_clients({ name = 'moonbit-lsp' })
+  for _, client in ipairs(clients) do
+    local bufs = vim.lsp.get_buffers_by_client_id(client.id)
+    client.stop()
+    vim.defer_fn(function()
+      for _, buf in ipairs(bufs) do
+        if vim.api.nvim_buf_is_valid(buf) then
+          M.on_attach(buf)
+        end
+      end
+    end, 500)
+  end
+end
+
+return M
