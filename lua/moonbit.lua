@@ -26,7 +26,11 @@ return {
     if opts.lsp ~= false then
       lsp = require('moonbit.lsp')
       lsp.setup(opts.lsp)
-      vim.api.nvim_create_user_command('MoonBitLspRestart', lsp.restart, {})
+      vim.api.nvim_create_user_command('MoonbitLspRestart', lsp.restart, {})
+      vim.api.nvim_create_user_command('MoonBitLspRestart', function()
+        vim.notify('MoonBitLspRestart is deprecated, use MoonbitLspRestart instead', vim.log.levels.WARN)
+        lsp.restart()
+      end, {})
     end
 
     jsonls.setup(opts.jsonls)

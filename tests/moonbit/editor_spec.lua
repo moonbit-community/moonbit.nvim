@@ -1,0 +1,73 @@
+local editor = require('moonbit.editor')
+
+describe('editor', function()
+  local buf
+
+  before_each(function()
+    buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_set_current_buf(buf)
+    vim.bo[buf].filetype = 'moonbit'
+    editor.on_attach(buf)
+  end)
+
+  after_each(function()
+    vim.api.nvim_buf_delete(buf, { force = true })
+  end)
+
+  describe('MoonbitToggleMultilineString', function()
+    it('inserts #| prefix', function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, true, { '  hello', '  world' })
+      vim.cmd('1,2MoonbitToggleMultilineString')
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, true)
+      assert.are.same({ '#|  hello', '#|  world' }, lines)
+    end)
+
+    it('removes #| prefix', function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, true, { '#|  hello', '#|  world' })
+      vim.cmd('1,2MoonbitToggleMultilineString')
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, true)
+      assert.are.same({ '  hello', '  world' }, lines)
+    end)
+
+    it('round-trips correctly', function()
+      local original = { '  hello', '  world' }
+      vim.api.nvim_buf_set_lines(buf, 0, -1, true, original)
+      vim.cmd('1,2MoonbitToggleMultilineString')
+      vim.cmd('1,2MoonbitToggleMultilineString')
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, true)
+      assert.are.same(original, lines)
+    end)
+  end)
+
+  describe('MoonbitToggleMultilineInterpolation', function()
+    it('inserts $| prefix', function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, true, { '  hello', '  world' })
+      vim.cmd('1,2MoonbitToggleMultilineInterpolation')
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, true)
+      assert.are.same({ '$|  hello', '$|  world' }, lines)
+    end)
+
+    it('removes $| prefix', function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, true, { '$|  hello', '$|  world' })
+      vim.cmd('1,2MoonbitToggleMultilineInterpolation')
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, true)
+      assert.are.same({ '  hello', '  world' }, lines)
+    end)
+  end)
+
+  describe('deprecated commands', function()
+    it('MoonBitToggleMultilineString still works', function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, true, { '  hello' })
+      vim.cmd('1MoonBitToggleMultilineString')
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, true)
+      assert.are.same({ '#|  hello' }, lines)
+    end)
+
+    it('MoonBitToggleMultilineInterpolation still works', function()
+      vim.api.nvim_buf_set_lines(buf, 0, -1, true, { '  hello' })
+      vim.cmd('1MoonBitToggleMultilineInterpolation')
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, true)
+      assert.are.same({ '$|  hello' }, lines)
+    end)
+  end)
+end)

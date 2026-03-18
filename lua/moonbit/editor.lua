@@ -65,12 +65,25 @@ end
 
 ---@param buffer integer
 local function setup_toggle_multiline_string(buffer)
+  vim.api.nvim_create_user_command('MoonbitToggleMultilineString', function(args)
+    execute_toggle_multiline_string(buffer, args.line1, args.line2, '#|')
+  end, {
+    range = true,
+  })
+  vim.api.nvim_create_user_command('MoonbitToggleMultilineInterpolation', function(args)
+    execute_toggle_multiline_string(buffer, args.line1, args.line2, '$|')
+  end, {
+    range = true,
+  })
+  -- Deprecated aliases
   vim.api.nvim_create_user_command('MoonBitToggleMultilineString', function(args)
+    vim.notify('MoonBitToggleMultilineString is deprecated, use MoonbitToggleMultilineString instead', vim.log.levels.WARN)
     execute_toggle_multiline_string(buffer, args.line1, args.line2, '#|')
   end, {
     range = true,
   })
   vim.api.nvim_create_user_command('MoonBitToggleMultilineInterpolation', function(args)
+    vim.notify('MoonBitToggleMultilineInterpolation is deprecated, use MoonbitToggleMultilineInterpolation instead', vim.log.levels.WARN)
     execute_toggle_multiline_string(buffer, args.line1, args.line2, '$|')
   end, {
     range = true,
