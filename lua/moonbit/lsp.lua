@@ -148,21 +148,55 @@ local function execute_mbti_unhide(command)
   vim.lsp.util.apply_workspace_edit({ changes = changes }, 'utf-16')
 end
 
----@param command vim.lsp.Command
-local function execute_go_to_locations(command)
-  local args = command.arguments or {}
-  -- args[1] = uri, args[2] = position, args[3] = locations
-  local locations = args[3]
+---@param locations lsp.Location[]
+---@param title string
+local function go_to_locations(locations, title)
   if not locations or #locations == 0 then
+    vim.notify('No locations found', vim.log.levels.INFO)
     return
   end
   if #locations == 1 then
     vim.lsp.util.show_document(locations[1], 'utf-8', { focus = true })
   else
     local items = vim.lsp.util.locations_to_items(locations, 'utf-8')
-    vim.fn.setqflist({}, ' ', { title = 'MoonBit Locations', items = items })
+    vim.fn.setqflist({}, ' ', { title = title, items = items })
     vim.cmd('copen')
   end
+end
+
+---@param command vim.lsp.Command
+local function execute_go_to_locations(command)
+  local args = command.arguments or {}
+  go_to_locations(args[3], 'MoonBit Locations')
+end
+
+---@param command vim.lsp.Command
+local function execute_reference_provider(command)
+  local args = command.arguments or {}
+  local uri = args[1]
+  local position = args[2]
+  if not uri or not position then
+    return
+  end
+
+  local clients = vim.lsp.get_clients({ name = 'moonbit-lsp' })
+  if #clients == 0 then
+    return
+  end
+
+  local params = {
+    textDocument = { uri = uri },
+    position = position,
+    context = { includeDeclaration = true },
+  }
+  clients[1]:request('textDocument/references', params, function(err, result)
+    if err or not result then
+      return
+    end
+    vim.schedule(function()
+      go_to_locations(result, 'MoonBit References')
+    end)
+  end)
 end
 
 ---@class MoonBit.LSP.Commands.Test
@@ -228,6 +262,7 @@ local commands = {
   ['moonbit-lsp/hide-mbti'] = execute_mbti_hide,
   ['moonbit-lsp/unhide-mbti'] = execute_mbti_unhide,
   ['moonbit.action.goToLocations'] = execute_go_to_locations,
+  ['moonbit.executeReferenceProvider'] = execute_reference_provider,
 }
 
 local M = {}
