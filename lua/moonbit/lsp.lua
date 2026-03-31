@@ -148,6 +148,23 @@ local function execute_mbti_unhide(command)
   vim.lsp.util.apply_workspace_edit({ changes = changes }, 'utf-16')
 end
 
+---@param command vim.lsp.Command
+local function execute_go_to_locations(command)
+  local args = command.arguments or {}
+  -- args[1] = uri, args[2] = position, args[3] = locations
+  local locations = args[3]
+  if not locations or #locations == 0 then
+    return
+  end
+  if #locations == 1 then
+    vim.lsp.util.show_document(locations[1], 'utf-8', { focus = true })
+  else
+    local items = vim.lsp.util.locations_to_items(locations, 'utf-8')
+    vim.fn.setqflist({}, ' ', { title = 'MoonBit Locations', items = items })
+    vim.cmd('copen')
+  end
+end
+
 ---@class MoonBit.LSP.Commands.Test
 ---@field backend string
 ---@field pkgPath string
@@ -210,6 +227,7 @@ local commands = {
   end,
   ['moonbit-lsp/hide-mbti'] = execute_mbti_hide,
   ['moonbit-lsp/unhide-mbti'] = execute_mbti_unhide,
+  ['moonbit.action.goToLocations'] = execute_go_to_locations,
 }
 
 local M = {}
