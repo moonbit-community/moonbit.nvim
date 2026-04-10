@@ -106,7 +106,7 @@ local function push_unhide_edits(changes, loc, prefix)
   end
 end
 
----@param command vim.lsp.Command
+---@param command lsp.Command
 local function execute_mbti_hide(command)
   local arguments = command.arguments and command.arguments[1]
   if arguments == nil then
@@ -127,7 +127,7 @@ local function execute_mbti_hide(command)
   vim.lsp.util.apply_workspace_edit({ changes = changes }, 'utf-16')
 end
 
----@param command vim.lsp.Command
+---@param command lsp.Command
 local function execute_mbti_unhide(command)
   local arguments = command.arguments and command.arguments[1]
   if arguments == nil then
@@ -164,13 +164,13 @@ local function go_to_locations(locations, title)
   end
 end
 
----@param command vim.lsp.Command
+---@param command lsp.Command
 local function execute_go_to_locations(command)
   local args = command.arguments or {}
   go_to_locations(args[3], 'MoonBit Locations')
 end
 
----@param command vim.lsp.Command
+---@param command lsp.Command
 local function execute_reference_provider(command)
   local args = command.arguments or {}
   local uri = args[1]
@@ -248,7 +248,7 @@ local function execute_moon_test(buffer, arguments)
       end
       vim.notify('MoonBit: ' .. summary, vim.log.levels.ERROR)
       vim.fn.setqflist({}, ' ', { lines = lines, efm = vim.bo.errorformat })
-      vim.cmd[[copen]]
+      vim.cmd [[copen]]
     end)
   end
   vim.system(args, { text = true }, on_test_exit)
@@ -267,6 +267,7 @@ local commands = {
 
 local M = {}
 
+---@type vim.lsp.Config
 local stored_config = nil
 
 function M.setup(opts)
@@ -294,6 +295,7 @@ function M.on_attach(bufnr)
   if vim.lsp and vim.lsp.config then
     if vim.bo[bufnr].filetype ~= 'moonbit' then
       vim.lsp.start({
+        cmd = { 'moonbit-lsp' },
         name = 'moonbit-lsp',
         root_dir = vim.fs.root(bufnr, { 'moon.mod.json' }),
       })
