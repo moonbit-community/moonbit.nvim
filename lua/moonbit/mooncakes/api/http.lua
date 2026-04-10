@@ -1,3 +1,4 @@
+local base       = require("moonbit.mooncakes.api.base")
 local curl       = require("plenary.curl")
 local semver     = require("moonbit.mooncakes.util.semver")
 local uv         = vim.uv
@@ -12,40 +13,7 @@ local path_sep = package.config:sub(1, 1)
 local cache_dir  = fn.stdpath("cache") .. path_sep .. "mooncakes"
 local cache_file = cache_dir .. path_sep .. "modules.json"
 
----@class MooncakeEntry
----@field name        string
----@field version     string
----@field description string?
----@field license     string?
----@field checksum    string
----@field created_at  string
-
----@class PkgIndex
----@field latest      string
----@field versions    table<string,MooncakeEntry>
----@field description string?
-
 local state      = { ts = 0, by_name = {}, flat = {} }
-
-local function build_index(mods)
-  local by_name, flat = {}, {}
-
-  for _, m in ipairs(mods) do
-    local pkg = by_name[m.name]
-    if not pkg then
-      pkg = { latest = m.version, description = m.description or "", versions = {} }
-      by_name[m.name] = pkg
-      table.insert(flat, { name = m.name, description = pkg.description })
-    else
-      if semver.compare(m.version, pkg.latest) > 0 then
-        pkg.latest = m.version
-      end
-    end
-    pkg.versions[m.version] = m
-  end
-
-  return by_name, flat
-end
 
 local function load_persistent_cache(mtime)
   local fh = io.open(cache_file, "r")
@@ -54,7 +22,7 @@ local function load_persistent_cache(mtime)
   fh:close()
   local ok, decoded = pcall(vim.json.decode, data)
   if not ok or type(decoded.modules) ~= "table" then return false end
-  state.by_name, state.flat = build_index(decoded.modules)
+  state.by_name, state.flat = base.build_index(decoded.modules)
   state.ts = mtime
   return true
 end
@@ -86,7 +54,7 @@ local function refresh(force)
   if resp.status == 200 then
     local ok, decoded = pcall(vim.json.decode, resp.body)
     if ok and type(decoded.modules) == "table" then
-      state.by_name, state.flat = build_index(decoded.modules)
+      state.by_name, state.flat = base.build_index(decoded.modules)
       state.ts = now
       write_persistent_cache(resp.body)
       return true

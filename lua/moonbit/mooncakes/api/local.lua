@@ -1,42 +1,10 @@
+local base       = require("moonbit.mooncakes.api.base")
 local semver     = require("moonbit.mooncakes.util.semver")
 local fn         = vim.fn
 local path_sep = package.config:sub(1, 1)
 
----@class MooncakeEntry
----@field name        string
----@field version     string
----@field description string?
----@field license     string?
----@field checksum    string
----@field created_at  string
-
----@class PkgIndex
----@field latest      string
----@field versions    table<string,MooncakeEntry>
----@field description string?
-
 local M = {}
 local state = { by_name = {}, flat = {}, loaded = false }
-
-local function build_index(mods)
-  local by_name, flat = {}, {}
-  for _, m in ipairs(mods) do
-    local pkg = by_name[m.name]
-    if not pkg then
-      pkg = {
-        latest      = m.version,
-        description = m.description or "",
-        versions    = {},
-      }
-      by_name[m.name] = pkg
-      table.insert(flat, { name = m.name, description = pkg.description })
-    elseif semver.compare(m.version, pkg.latest) > 0 then
-      pkg.latest = m.version
-    end
-    pkg.versions[m.version] = m
-  end
-  return by_name, flat
-end
 
 local function load_local_entries()
   local entries = {}
@@ -48,8 +16,8 @@ local function load_local_entries()
     end
     moon_home = home .. path_sep .. '.moon'
   end
-  local base = fn.expand(moon_home .. path_sep .. "registry" .. path_sep .. "index" .. path_sep .. "user")
-  local creators = fn.glob(base .. path_sep .. "*", true, true)
+  local index_dir = fn.expand(moon_home .. path_sep .. "registry" .. path_sep .. "index" .. path_sep .. "user")
+  local creators = fn.glob(index_dir .. path_sep .. "*", true, true)
   for _, creator_path in ipairs(creators) do
     local files = fn.glob(creator_path .. path_sep .. "*.index", true, true)
     for _, path in ipairs(files) do
@@ -73,7 +41,7 @@ end
 local function ensure_index()
   if not state.loaded then
     local entries = load_local_entries()
-    state.by_name, state.flat = build_index(entries)
+    state.by_name, state.flat = base.build_index(entries)
     state.loaded = true
   end
 end
