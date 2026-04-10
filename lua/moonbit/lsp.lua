@@ -311,7 +311,7 @@ end
 function M.restart()
   local clients = vim.lsp.get_clients({ name = 'moonbit-lsp' })
   for _, client in ipairs(clients) do
-    local bufs = vim.lsp.get_buffers_by_client_id(client.id)
+    local bufs = vim.tbl_keys(client.attached_buffers)
     client.stop()
     vim.defer_fn(function()
       for _, buf in ipairs(bufs) do
