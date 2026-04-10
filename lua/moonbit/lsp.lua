@@ -106,8 +106,14 @@ local function push_unhide_edits(changes, loc, prefix)
   end
 end
 
+---@class MoonBit.LSP.Commands.MbtiHide
+---@field sigLoc lsp.Location
+---@field locations lsp.Location[]
+---@field canAddPriv boolean
+
 ---@param command lsp.Command
 local function execute_mbti_hide(command)
+  ---@type MoonBit.LSP.Commands.MbtiHide?
   local arguments = command.arguments and command.arguments[1]
   if arguments == nil then
     return
@@ -127,8 +133,14 @@ local function execute_mbti_hide(command)
   vim.lsp.util.apply_workspace_edit({ changes = changes }, 'utf-16')
 end
 
+---@class MoonBit.LSP.Commands.MbtiUnhide
+---@field attrLoc lsp.Location
+---@field locations lsp.Location[]
+---@field prefix string
+
 ---@param command lsp.Command
 local function execute_mbti_unhide(command)
+  ---@type MoonBit.LSP.Commands.MbtiUnhide?
   local arguments = command.arguments and command.arguments[1]
   if arguments == nil then
     return
@@ -167,13 +179,18 @@ end
 ---@param command lsp.Command
 local function execute_go_to_locations(command)
   local args = command.arguments or {}
-  go_to_locations(args[3], 'MoonBit Locations')
+  -- args[1] = uri, args[2] = position, args[3] = locations
+  ---@type lsp.Location[]
+  local locations = args[3]
+  go_to_locations(locations, 'MoonBit Locations')
 end
 
 ---@param command lsp.Command
 local function execute_reference_provider(command)
   local args = command.arguments or {}
+  ---@type string?
   local uri = args[1]
+  ---@type lsp.Position?
   local position = args[2]
   if not uri or not position then
     return
@@ -255,7 +272,9 @@ local function execute_moon_test(buffer, arguments)
 end
 
 local commands = {
+  ---@param command lsp.Command
   ['moonbit-lsp/test'] = function(command)
+    ---@type MoonBit.LSP.Commands.Test
     local arguments = command.arguments[1]
     execute_moon_test(0, arguments)
   end,
