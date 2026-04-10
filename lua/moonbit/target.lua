@@ -20,7 +20,7 @@ local function set_target(target)
 
           for _, client in ipairs(vim.lsp.get_clients()) do
             if client.name:match('moonbit') then
-              client.stop()
+              client:stop()
             end
           end
 
