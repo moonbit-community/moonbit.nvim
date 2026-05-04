@@ -1,6 +1,11 @@
 local path_sep = package.config:sub(1, 1)
 
 ---@return string
+local function lsp_server_executable_name()
+  return vim.fn.has('win32') == 1 and 'moonbit-lsp.exe' or 'moonbit-lsp'
+end
+
+---@return string
 local function find_lsp_server()
   local moon_home = vim.env["MOON_HOME"]
   if moon_home == nil then
@@ -10,7 +15,9 @@ local function find_lsp_server()
     end
     moon_home = home .. path_sep .. '.moon'
   end
-  local lsp_server_path = vim.fn.resolve(moon_home .. path_sep .. 'bin' .. path_sep .. 'lsp-server.js')
+  local lsp_server_path = vim.fn.resolve(
+    moon_home .. path_sep .. 'bin' .. path_sep .. lsp_server_executable_name()
+  )
   if vim.fn.executable(lsp_server_path) ~= 0 then
     return lsp_server_path
   end
@@ -313,11 +320,11 @@ end
 function M.on_attach(bufnr)
   if vim.lsp and vim.lsp.config then
     if vim.bo[bufnr].filetype ~= 'moonbit' then
-      vim.lsp.start({
-        cmd = { 'moonbit-lsp' },
+      vim.lsp.start(vim.tbl_deep_extend("keep", stored_config or {}, {
+        cmd = { find_lsp_server() },
         name = 'moonbit-lsp',
         root_dir = vim.fs.root(bufnr, { 'moon.mod.json' }),
-      })
+      }))
     end
     return
   end
