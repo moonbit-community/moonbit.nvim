@@ -1,7 +1,7 @@
 local path_sep = package.config:sub(1, 1)
 
 ---@return string
-local function find_lsp_server()
+local function get_moon_home()
   local moon_home = vim.env["MOON_HOME"]
   if moon_home == nil then
     local home = vim.env["HOME"]
@@ -10,11 +10,44 @@ local function find_lsp_server()
     end
     moon_home = home .. path_sep .. '.moon'
   end
-  local lsp_server_path = vim.fn.resolve(moon_home .. path_sep .. 'bin' .. path_sep .. 'lsp-server.js')
-  if vim.fn.executable(lsp_server_path) ~= 0 then
-    return lsp_server_path
+  return moon_home
+end
+
+---@param path string
+---@return string?
+local function resolve_executable(path)
+  local resolved = vim.fn.resolve(path)
+  if vim.fn.executable(resolved) ~= 0 then
+    return resolved
   end
-  return 'moonbit-lsp'
+  return nil
+end
+
+---@return string[]
+local function find_native_lsp_command()
+  local moon_lsp_path = resolve_executable(get_moon_home() .. path_sep .. 'bin' .. path_sep .. 'moon-lsp')
+  if moon_lsp_path ~= nil then
+    return { moon_lsp_path, '--stdio' }
+  end
+  return { 'moon-lsp', '--stdio' }
+end
+
+---@return string[]
+local function find_legacy_lsp_command()
+  local lsp_server_path = resolve_executable(get_moon_home() .. path_sep .. 'bin' .. path_sep .. 'lsp-server.js')
+  if lsp_server_path ~= nil then
+    return { lsp_server_path }
+  end
+  return { 'moonbit-lsp' }
+end
+
+---@param opts table?
+---@return string[]
+local function find_lsp_command(opts)
+  if opts ~= nil and opts.native == true then
+    return find_native_lsp_command()
+  end
+  return find_legacy_lsp_command()
 end
 
 ---@param uri string
@@ -290,8 +323,11 @@ local M = {}
 local stored_config = nil
 
 function M.setup(opts)
-  stored_config = vim.tbl_deep_extend("keep", opts or {}, {
-    cmd = { find_lsp_server() },
+  opts = opts or {}
+  local lsp_opts = vim.deepcopy(opts)
+  lsp_opts.native = nil
+  stored_config = vim.tbl_deep_extend("keep", lsp_opts, {
+    cmd = find_lsp_command(opts),
     commands = commands,
   })
   if vim.lsp and vim.lsp.config then
@@ -313,11 +349,13 @@ end
 function M.on_attach(bufnr)
   if vim.lsp and vim.lsp.config then
     if vim.bo[bufnr].filetype ~= 'moonbit' then
-      vim.lsp.start({
-        cmd = { 'moonbit-lsp' },
+      vim.lsp.start(vim.tbl_deep_extend("keep", {
         name = 'moonbit-lsp',
         root_dir = vim.fs.root(bufnr, { 'moon.mod.json' }),
-      })
+      }, stored_config or {
+        cmd = find_lsp_command(nil),
+        commands = commands,
+      }))
     end
     return
   end
