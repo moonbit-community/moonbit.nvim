@@ -43,8 +43,8 @@ the MoonBit language.
     -- configure the language server integration
     -- set `lsp = false` to disable the language server integration
     lsp = {
-      -- set to true to use the native language server shipped as `moon-lsp`
-      native = false,
+      -- set to false to use the legacy language server
+      native = true,
       -- provide an `on_attach` function to run when the language server starts
       on_attach = function(client, bufnr) end,
       -- provide client capabilities to pass to the language server

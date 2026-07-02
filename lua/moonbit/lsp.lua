@@ -44,10 +44,10 @@ end
 ---@param opts table?
 ---@return string[]
 local function find_lsp_command(opts)
-  if opts ~= nil and opts.native == true then
-    return find_native_lsp_command()
+  if opts ~= nil and opts.native == false then
+    return find_legacy_lsp_command()
   end
-  return find_legacy_lsp_command()
+  return find_native_lsp_command()
 end
 
 ---@param uri string
