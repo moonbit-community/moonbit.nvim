@@ -26,17 +26,9 @@ describe('highlights', function()
     clear_groups()
   end)
 
-  it('sets default semantic token highlights', function()
+  it('sets default semantic token modifier highlights', function()
     highlights.setup()
 
-    assert.are.equal('Function', vim.api.nvim_get_hl(0, {
-      name = '@lsp.type.function_call.moonbit',
-      link = true,
-    }).link)
-    assert.are.equal('Function', vim.api.nvim_get_hl(0, {
-      name = '@lsp.type.function_decl.moonbit',
-      link = true,
-    }).link)
     assert.is_true(vim.api.nvim_get_hl(0, {
       name = '@lsp.typemod.function_call.async.moonbit',
     }).italic)
@@ -51,6 +43,19 @@ describe('highlights', function()
     }).underline)
   end)
 
+  it('does not color semantic token types as functions', function()
+    highlights.setup()
+
+    assert.is_nil(vim.api.nvim_get_hl(0, {
+      name = '@lsp.type.function_call.moonbit',
+      link = true,
+    }).link)
+    assert.is_nil(vim.api.nvim_get_hl(0, {
+      name = '@lsp.type.function_decl.moonbit',
+      link = true,
+    }).link)
+  end)
+
   it('registers a colorscheme refresh', function()
     highlights.setup()
 
@@ -62,16 +67,17 @@ describe('highlights', function()
   end)
 
   it('does not override user highlight customizations', function()
-    vim.api.nvim_set_hl(0, '@lsp.type.function_call.moonbit', {
-      link = 'Identifier',
+    vim.api.nvim_set_hl(0, '@lsp.typemod.function_call.async.moonbit', {
+      bold = true,
     })
 
     highlights.setup()
     vim.api.nvim_exec_autocmds('ColorScheme', {})
 
-    assert.are.equal('Identifier', vim.api.nvim_get_hl(0, {
-      name = '@lsp.type.function_call.moonbit',
-      link = true,
-    }).link)
+    local actual = vim.api.nvim_get_hl(0, {
+      name = '@lsp.typemod.function_call.async.moonbit',
+    })
+    assert.is_true(actual.bold)
+    assert.is_nil(actual.italic)
   end)
 end)

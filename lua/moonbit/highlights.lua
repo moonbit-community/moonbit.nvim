@@ -1,8 +1,6 @@
 local M = {}
 
 local semantic_token_highlights = {
-  ['@lsp.type.function_call.moonbit'] = { link = 'Function', default = true },
-  ['@lsp.type.function_decl.moonbit'] = { link = 'Function', default = true },
   ['@lsp.typemod.function_call.async.moonbit'] = { italic = true, default = true },
   ['@lsp.typemod.function_decl.async.moonbit'] = { italic = true, default = true },
   ['@lsp.typemod.function_call.error.moonbit'] = { underline = true, default = true },
