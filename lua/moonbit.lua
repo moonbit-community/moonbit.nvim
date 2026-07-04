@@ -2,6 +2,7 @@ local editor = require 'moonbit.editor'
 local compiler = require 'moonbit.compiler'
 local target = require 'moonbit.target'
 local jsonls = require 'moonbit.jsonls'
+local highlights = require 'moonbit.highlights'
 
 local mooncakes = require 'moonbit.mooncakes'
 
@@ -21,6 +22,7 @@ return {
     if has_plenary then
       require("plenary.filetype").add_file("moonbit")
     end
+    highlights.setup()
 
     local lsp = nil
     if opts.lsp ~= false then
