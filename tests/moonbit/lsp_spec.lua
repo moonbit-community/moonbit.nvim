@@ -63,6 +63,7 @@ describe('lsp', function()
 
     assert.are.equal('moonbit-lsp', captured_config.name)
     assert.are.same({ native_lsp, '--stdio' }, captured_config.config.cmd)
+    assert.are.same({ 'moon.mod', 'moon.mod.json', 'moon.work' }, captured_config.config.root_markers)
     assert.is_nil(captured_config.config.native)
   end)
 
@@ -97,5 +98,28 @@ describe('lsp', function()
     assert.are.same({ native_lsp, '--stdio' }, started_config.cmd)
 
     vim.api.nvim_buf_delete(buf, { force = true })
+  end)
+
+  it('uses MoonBit project markers for non-moonbit buffers', function()
+    local lsp = fresh_lsp()
+    lsp.setup({})
+
+    for _, marker in ipairs({ 'moon.mod', 'moon.mod.json', 'moon.work' }) do
+      local dir = vim.fn.tempname()
+      vim.fn.mkdir(dir, 'p')
+      vim.fn.writefile({}, dir .. '/' .. marker)
+      vim.fn.writefile({}, dir .. '/moon.pkg')
+      table.insert(tmpdirs, dir)
+
+      local buf = vim.api.nvim_create_buf(false, false)
+      vim.api.nvim_buf_set_name(buf, dir .. '/moon.pkg')
+      vim.bo[buf].filetype = 'json'
+      started_config = nil
+
+      lsp.on_attach(buf)
+
+      assert.are.equal(vim.fn.resolve(dir), vim.fn.resolve(started_config.root_dir))
+      vim.api.nvim_buf_delete(buf, { force = true })
+    end
   end)
 end)
